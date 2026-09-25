@@ -30,16 +30,16 @@ Production: `npm run build` then `npm start`. The server serves `dist/` itself o
 
 ## Hosting (phone access)
 
-The server is safe to expose only with a password. When `RAILWAY_ENVIRONMENT` or `NODE_ENV=production` is set it refuses to start unless `APP_PASSWORD` is set. The browser asks for the password once (HTTP Basic Auth) and remembers it. Model routes are also rate limited per IP address (`RATE_LIMIT_PER_5MIN`, default 30).
+The server is safe to expose only with a password. When Railway's `RAILWAY_ENVIRONMENT_NAME` or `NODE_ENV=production` is set it refuses to start unless `APP_PASSWORD` is set. The browser asks for the password once (HTTP Basic Auth) and remembers it. Model routes are also rate limited per IP address (`RATE_LIMIT_PER_5MIN`, default 30).
 
 On Railway:
 
 1. New project from this GitHub repo, pick the branch.
-2. Variables: `OPENAI_API_KEY`, `OPENAI_MODEL`, `APP_PASSWORD`, `OPENAI_MAX_OUTPUT_TOKENS`, `OPENAI_REASONING_EFFORT`. Railway supplies `PORT` itself.
-3. Build command `npm run build`, start command `npm start`. The server serves the built page on one port.
+2. Variables: `OPENAI_API_KEY`, `OPENAI_MODEL`, `APP_PASSWORD`, `OPENAI_MAX_OUTPUT_TOKENS`, `OPENAI_REASONING_EFFORT`. Railway injects `PORT` itself and the server listens on it.
+3. Build and start come from `railway.json`: `npm run build`, `npm start`, health check on `/api/health`. Railpack would pick the same two commands on its own from package.json; the file adds the health check and keeps them explicit.
 4. Set a monthly spending limit on the OpenAI side before the first deploy.
 
-A `railway.json` with the build and start commands is pending until Railway's current config-as-code reference can be checked.
+Checked against Railway's docs on 2026-09-25: `railway.json` is deprecated in favor of Infrastructure as Code (`.railway/railway.ts`, applied through the Railway CLI, not read on deploy). Existing files keep working until 2026-12-01. After that date set the same three values in the service settings in the dashboard, or apply them with the CLI.
 
 ## Verified
 
