@@ -5,7 +5,7 @@ function parseToolbox(text) {
   const map={};const lines=text.split('\n');let cur=null,acc=[];
   const isSep=l=>/^[=\-]{4,}/.test(l.trim())||/^\*{4,}/.test(l.trim());
   const flush=()=>{if(cur&&acc.length){let v=acc.join(' ').trim();if(v.startsWith('(')&&v.endsWith(')'))v=v.slice(1,-1);map[cur]=v.trim();}};
-  for(const raw of lines){const l=raw.trim();if(!l)continue;if(isSep(l)){flush();cur=null;acc=[];continue;}const m=l.match(/^([A-Z_][A-Z0-9_]+)\s*=\s*(.*)/);if(m){flush();cur=m[1];acc=[m[2]];}else if(cur&&!l.startsWith('==')&&!l.startsWith('**'))acc.push(l);}
+  for(const raw of lines){const l=raw.trim();if(!l)continue;if(isSep(l)){flush();cur=null;acc=[];continue;}const m=l.match(/^([A-Z_][A-Z0-9_]+)\s*=\s*(.*)/);if(m){flush();cur=m[1];acc=[m[2]];}else if(cur&&!l.startsWith('==')&&!l.startsWith('**'))acc.push(l);else console.warn('[toolbox] skipped line'+(cur?' under '+cur:' before any key')+': '+l.slice(0,80));}
   flush();return map;
 }
 function resolvePipes(str){
