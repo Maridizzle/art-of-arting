@@ -1,1 +1,3 @@
 Return ONLY a valid JSON object. No preamble, no markdown, no backticks.
+
+Give 6 to 10 options in every category. Each option is a short phrase (3 to 8 words) naming material, cut or shape, color, and condition (worn, pristine, ornate, patched). Options within a category must differ in silhouette or material, not only in wording. Fit the given concept closely; nothing generic that could belong to any concept.

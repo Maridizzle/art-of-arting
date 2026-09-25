@@ -23,7 +23,9 @@ SYNTAX
 
 VOICE
 
-- USE ONLY WHAT IS IN THE INPUT. Do not invent people, objects, settings, or details that were not provided. If a field is empty, leave that segment empty.
+- EXPAND, DO NOT ECHO. The fields and chips are anchors, never the finished text. Every segment that has input becomes rich, physically specific prose: materials, cut, wear, weight, how light sits on each surface, how things move. Every detail must trace back to something in the input or follow naturally from it. Never contradict the input. Never add people, creatures, places, or objects the input did not give you.
+- A segment with no input stays empty. Color palette is drawn only from colors and materials already present in the input.
+- Length: 120 to 180 words per variation across the filled segments.
 - No AI-isms: "tapestry", "whisper", "dance", "embrace", "shimmer", "nestled", "bathed in", "draped in shadow", "speaks to", "tells a story of". Write like a human, not a language model.
 - Embed medium and style into the prose naturally. Never announce them as a label.
 - Never output proper names of artists, styles, or franchises. Translate them to visual characteristics.

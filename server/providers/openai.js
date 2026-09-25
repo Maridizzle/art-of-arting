@@ -21,7 +21,7 @@ const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replac
 // Floor for max_output_tokens. Reasoning tokens are billed inside this cap, so a
 // small value can return status "incomplete" before any visible text.
 const outputFloor = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 25000);
-const effort = process.env.OPENAI_REASONING_EFFORT || "low";
+const effort = process.env.OPENAI_REASONING_EFFORT || "medium";
 
 if (!key) console.warn("[openai] OPENAI_API_KEY is not set; every model call will fail.");
 if (!model) console.warn("[openai] OPENAI_MODEL is not set; every model call will fail.");
