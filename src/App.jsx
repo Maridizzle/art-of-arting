@@ -516,6 +516,7 @@ export default function App(){
   const[tbCount,setTbCount]=useState(0);
   const[chunks,setChunks]=useState(()=>Array(TOTAL_PAGES).fill(""));
   const[showLoader,setShowLoader]=useState(false);
+  const[emitRaw,setEmitRaw]=useState(false); // true: send {braces} and [TAGS] untouched, for pasting into a Perchance generator
   const taRef=useRef(null);
 
   const loadMap=json=>{const map=parseToolbox(Object.values(json).join('\n'));setToolbox(map);setTbCount(Object.keys(map).length);};
@@ -546,7 +547,7 @@ export default function App(){
   const doGenerate=async()=>{
     setLoading(true);setGenErr("");setVars([]);
     try{
-      const rd1=resolveData(d,toolbox),rd2=resolveData(d,toolbox),rd3=resolveData(d,toolbox);
+      const rd1=emitRaw?d:resolveData(d,toolbox),rd2=emitRaw?d:resolveData(d,toolbox),rd3=emitRaw?d:resolveData(d,toolbox);
       const result=await generate(mode,buildGenPromptVaried(rd1,rd2,rd3,mode));
       const parsed=(result.variations||[]).map(v=>parseSections(v,mode));
       setVars(parsed);
@@ -565,7 +566,8 @@ export default function App(){
   };
 
   const resolvedPreviewData=useMemo(()=>resolveData(d,toolbox),[d,mode,toolbox]);
-  const preview=useMemo(()=>buildPreview(resolvedPreviewData,mode),[resolvedPreviewData,mode]);
+  const resolvedPreview=useMemo(()=>buildPreview(resolvedPreviewData,mode),[resolvedPreviewData,mode]);
+  const preview=useMemo(()=>emitRaw?buildPreview(d,mode):resolvedPreview,[emitRaw,d,mode,resolvedPreview]);
   const warnings=useMemo(()=>lint(preview,d),[preview,d]);
   const activeTags=useMemo(()=>[...new Set((Object.values(d).flat().filter(v=>typeof v==='string').join(' ')).match(/\[([A-Z_][A-Z0-9_]+)\]/g)||[])],[d]);
 
@@ -588,6 +590,7 @@ export default function App(){
             <label className="uploadbtn">⬆ Upload JSON<input type="file" accept=".json" style={{display:"none"}} onChange={handleUpload}/></label>
             {tbCount>0&&<button className="uploadbtn" onClick={clearAll} style={{borderColor:"var(--bad)",color:"var(--bad)"}}>✕ Clear</button>}
           </div>
+          <Tog on={!emitRaw} onClick={()=>setEmitRaw(r=>!r)} label={emitRaw?"Emitting raw {braces} and [TAGS] for pasting into a Perchance generator":"Resolving {braces} and [TAGS] locally for testing"}/>
           {showLoader&&(
             <div className="chunkloader">
               <div className="chunktitle">Paste each page from your notepad_export JSON</div>
