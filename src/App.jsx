@@ -266,7 +266,7 @@ function buildGenPrompt(d,mode){
   }
   else if(mode==="costume"){a("Theme",d.theme);aa("Top",d.top_sel);aa("Bottoms",d.bottoms_sel);aa("Shoes",d.shoes_sel);aa("Accessories",d.accessories_sel);a("Vibe",d.vibe);}
   else if(mode==="character"){a("Concept",d.concept);aa("Species",d.species);aa("Body",d.body);aa("Age",d.age);aa("Archetype",d.archetype);aa("Skin",d.skin);aa("Eyes",d.eyes);aa("Hair",d.hair);a("Marks",d.marks);aa("Expression",d.expression);aa("World",d.world);}
-  else if(mode==="scene"){if(d.characters?.filter(Boolean).length)a("Characters",d.characters.filter(Boolean).join(" | "));a("Environment",d.environment);a("Action level",d.action_level);aa("Lighting",d.lighting);}
+  else if(mode==="scene"){if(d.characters?.filter(Boolean).length)a("Characters",d.characters.filter(Boolean).join(". "));a("Environment",d.environment);a("Action level",d.action_level);aa("Lighting",d.lighting);}
   return L.join("\n");
 }
 
