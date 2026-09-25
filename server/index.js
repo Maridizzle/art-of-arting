@@ -15,8 +15,9 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.PORT || 8787);
 const MODES = new Set(["image", "overlay", "costume", "character", "scene"]);
 
-// Hosted means reachable by strangers. Railway sets RAILWAY_ENVIRONMENT; NODE_ENV=production covers other hosts.
-const HOSTED = Boolean(process.env.RAILWAY_ENVIRONMENT) || process.env.NODE_ENV === "production";
+// Hosted means reachable by strangers. Railway injects RAILWAY_ENVIRONMENT_NAME (per its
+// variables reference); NODE_ENV=production covers other hosts.
+const HOSTED = Boolean(process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT) || process.env.NODE_ENV === "production";
 const APP_PASSWORD = process.env.APP_PASSWORD || "";
 if (HOSTED && !APP_PASSWORD) {
   console.error("Refusing to start: APP_PASSWORD is not set. A hosted server with no password lets anyone spend the API key.");
