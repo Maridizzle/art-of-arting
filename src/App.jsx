@@ -87,6 +87,8 @@ const CSS=`
 @media(max-width:760px){.ab .bd{grid-template-columns:1fr}}
 .ab .sb{position:sticky;top:12px}
 @media(max-width:760px){.ab .sb{position:static}}
+/* Phone: bigger tap targets, and 16px inputs so iOS Safari does not zoom on focus */
+@media(max-width:760px){.ab .tab{padding:.62rem 1rem;font-size:.76rem}.ab .chip{padding:.5rem .72rem;font-size:.82rem}.ab .tog{padding:.7rem .8rem}.ab .addbtn,.ab .uploadbtn,.ab .cpbtn,.ab .cpbtn-all{padding:.6rem .9rem}.ab input.fi,.ab textarea.fi{font-size:16px}}
 .ab .sec{margin-bottom:16px}
 .ab .sectl{font-family:var(--dm);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mag);margin-bottom:7px;display:flex;align-items:center;gap:.4rem}
 .ab .sectl::after{content:"";flex:1;height:1px;background:rgba(255,0,204,.17)}

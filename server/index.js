@@ -6,6 +6,7 @@ import express from "express";
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { timingSafeEqual } from "node:crypto";
 import { send, providerName } from "./provider.js";
 import { prompt } from "./prompts.js";
 import { parseModelJson, parseVisionJson } from "./parse.js";
@@ -14,8 +15,57 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.PORT || 8787);
 const MODES = new Set(["image", "overlay", "costume", "character", "scene"]);
 
+// Hosted means reachable by strangers. Railway sets RAILWAY_ENVIRONMENT; NODE_ENV=production covers other hosts.
+const HOSTED = Boolean(process.env.RAILWAY_ENVIRONMENT) || process.env.NODE_ENV === "production";
+const APP_PASSWORD = process.env.APP_PASSWORD || "";
+if (HOSTED && !APP_PASSWORD) {
+  console.error("Refusing to start: APP_PASSWORD is not set. A hosted server with no password lets anyone spend the API key.");
+  process.exit(1);
+}
+if (!HOSTED && !APP_PASSWORD) console.warn("[auth] APP_PASSWORD not set; running open because this is not a hosted environment.");
+
 const app = express();
+// Behind Railway's proxy the client address arrives in X-Forwarded-For; trust one hop so the rate limit sees real IPs.
+if (HOSTED || process.env.TRUST_PROXY === "1") app.set("trust proxy", 1);
 app.use(express.json({ limit: "8mb" }));
+
+// Password gate: HTTP Basic Auth on everything except the health probe. The browser
+// asks once and remembers. Username is ignored; only the password is checked.
+const safeEqual = (a, b) => {
+  const ab = Buffer.from(a), bb = Buffer.from(b);
+  return ab.length === bb.length && timingSafeEqual(ab, bb);
+};
+app.use((req, res, next) => {
+  if (!APP_PASSWORD || req.path === "/api/health") return next();
+  const header = req.headers.authorization || "";
+  if (header.startsWith("Basic ")) {
+    const decoded = Buffer.from(header.slice(6), "base64").toString("utf8");
+    const password = decoded.slice(decoded.indexOf(":") + 1);
+    if (safeEqual(password, APP_PASSWORD)) return next();
+  }
+  res.set("WWW-Authenticate", 'Basic realm="Art of Arting", charset="UTF-8"');
+  res.status(401).send("Password required");
+});
+
+// Per-IP rate limit on model routes: a leaked link cannot drain the key in a loop.
+// Fixed window, in memory, which is enough for one server and one user.
+const RATE_LIMIT = Number(process.env.RATE_LIMIT_PER_5MIN || 30);
+const WINDOW_MS = 5 * 60 * 1000;
+const hits = new Map(); // ip -> { count, resetAt }
+app.use("/api", (req, res, next) => {
+  if (req.path === "/health") return next();
+  const now = Date.now();
+  const ip = req.ip || "unknown";
+  let rec = hits.get(ip);
+  if (!rec || rec.resetAt <= now) { rec = { count: 0, resetAt: now + WINDOW_MS }; hits.set(ip, rec); }
+  rec.count += 1;
+  if (rec.count > RATE_LIMIT) {
+    res.set("Retry-After", String(Math.ceil((rec.resetAt - now) / 1000)));
+    return res.status(429).json({ error: `Too many requests. Limit is ${RATE_LIMIT} per 5 minutes; try again shortly.` });
+  }
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.resetAt <= now) hits.delete(k);
+  next();
+});
 
 // Log method, path, status and duration only. Never bodies.
 app.use((req, res, next) => {

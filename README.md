@@ -28,6 +28,19 @@ Production: `npm run build` then `npm start`. The server serves `dist/` itself o
 
 `.env` is git-ignored. Never commit it.
 
+## Hosting (phone access)
+
+The server is safe to expose only with a password. When `RAILWAY_ENVIRONMENT` or `NODE_ENV=production` is set it refuses to start unless `APP_PASSWORD` is set. The browser asks for the password once (HTTP Basic Auth) and remembers it. Model routes are also rate limited per IP address (`RATE_LIMIT_PER_5MIN`, default 30).
+
+On Railway:
+
+1. New project from this GitHub repo, pick the branch.
+2. Variables: `OPENAI_API_KEY`, `OPENAI_MODEL`, `APP_PASSWORD`, `OPENAI_MAX_OUTPUT_TOKENS`, `OPENAI_REASONING_EFFORT`. Railway supplies `PORT` itself.
+3. Build command `npm run build`, start command `npm start`. The server serves the built page on one port.
+4. Set a monthly spending limit on the OpenAI side before the first deploy.
+
+A `railway.json` with the build and start commands is pending until Railway's current config-as-code reference can be checked.
+
 ## Verified
 
 Checked 2026-09-25 against OpenAI's developer documentation (developers.openai.com, vendor primary):
