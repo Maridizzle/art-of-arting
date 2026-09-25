@@ -28,9 +28,15 @@ Production: `npm run build` then `npm start`. The server serves `dist/` itself o
 
 `.env` is git-ignored. Never commit it.
 
-## Unverified
+## Verified
 
-The OpenAI request shape in `server/providers/openai.js` (Chat Completions endpoint, `max_completion_tokens`, `image_url` parts carrying a data URL) was written without access to OpenAI's docs. The model ID `gpt-6-astra` comes from news and blog reports, not from OpenAI's model list. Check both against https://platform.openai.com/docs before trusting a real run.
+Checked 2026-09-25 against OpenAI's developer documentation (developers.openai.com, vendor primary):
+
+- `gpt-6-astra` is listed on the models page as the recommended starting point, with image input supported.
+- The adapter uses the Responses API (`POST /v1/responses`), which OpenAI recommends over Chat Completions for text generation. Field names follow the text, images-and-vision, and reasoning guides and the Responses create reference.
+- `max_output_tokens` includes reasoning tokens. OpenAI recommends reserving at least 25,000, which is the default in `.env.example`. A cap that is too small returns status `incomplete` with no text.
+
+Pages: `/api/docs/models`, `/api/docs/guides/text`, `/api/docs/guides/images-vision`, `/api/docs/guides/reasoning`, `/api/reference/resources/responses/methods/create`.
 
 ## Sign-off
 
