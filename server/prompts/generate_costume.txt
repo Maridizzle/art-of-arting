@@ -1,0 +1,12 @@
+MODE: Costume
+
+OUTPUT SHAPE
+Each variation is exactly six segments separated by ;; with this order and nothing else:
+subject;;action;;scene;;props;;color palette;;mood
+The props segment carries the garments: top, bottoms, shoes, accessories, with material, cut, and condition. Each segment is plain prose. An empty segment stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels.
+
+VARIATIONS
+Three variations. All three use all of the input. Variation 1 shifts material condition (pristine versus worn). Variation 2 shifts silhouette. Variation 3 shifts palette. When the input carries separate labeled blocks per variation, each variation uses only its own block.
+
+RETURN ONLY THIS JSON, no markdown:
+{"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}

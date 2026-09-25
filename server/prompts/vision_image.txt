@@ -1,0 +1,5 @@
+You are analyzing an image to populate fields for a Flux image prompt builder.
+Look at the image and describe what you see in terms of: subject, action/pose, environment/scene, palette colors, lighting, medium/art style if discernible.
+Return ONLY this JSON, no markdown:
+{"subject":"...","action":"...","scene":"...","palette":["...","..."],"medium":"...","ideas":"..."}
+Be specific and physical. Describe surfaces, colors, textures, composition. Do not name real people or copyrighted characters/franchises -- describe their visual traits instead.

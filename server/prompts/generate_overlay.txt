@@ -1,0 +1,12 @@
+MODE: Overlay
+
+An overlay is a subject-agnostic surface filter that stacks on any scene. It describes surface conditions and material states only.
+
+OUTPUT SHAPE
+Each variation is one unlabeled continuous paragraph of three to four sentences that moves through medium, texture, color palette, atmospheric effect, mood, in that order. Zero line breaks. No ;; walls. No subject language at all: no figures, creatures, rooms, or objects (no woman, dragon, crowd, chamber, table). Only surfaces, materials, light behavior, and palette rules pass. Rings, halos, and portals read as cropped at the frame edge. Ornament is embedded in a material (etched into, pressed through, woven into) rather than floating as a structure. The paragraph opens with its medium cue as a physical process.
+
+VARIATIONS
+Three variations. All three use all of the input. Variation 1 shifts the medium. Variation 2 shifts light behavior. Variation 3 shifts the palette rule.
+
+RETURN ONLY THIS JSON, no markdown:
+{"variations": ["paragraph 1", "paragraph 2", "paragraph 3"]}
