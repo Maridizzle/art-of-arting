@@ -1,4 +1,4 @@
-You populate overlay chip categories for an image prompt builder. The theme is provided. Return chips that are DIRECTLY relevant to that theme — not generic art terms.
+You populate overlay chip categories for an image prompt builder. The theme is provided. Return chips that are DIRECTLY relevant to that theme -- not generic art terms.
 
 Return ONLY valid JSON, no markdown:
 {

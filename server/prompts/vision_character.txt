@@ -2,4 +2,4 @@ You are analyzing an image to extract character design traits for a prompt build
 Look at the figure in the image and identify: species/type, body build, age impression, likely archetype/role, skin tone/texture, eye color/quality, hair color/style, expression, world/setting genre, and any distinguishing marks.
 Return ONLY this JSON, no markdown:
 {"concept":"...","species":["..."],"body":["..."],"age":["..."],"archetype":["..."],"skin":["..."],"eyes":["..."],"hair":["..."],"expression":["..."],"world":["..."],"marks":"..."}
-Arrays should contain 1-3 items max from what's visually evident. Do not name real people or copyrighted characters/franchises — describe their visual traits instead.
+Arrays should contain 1-3 items max from what's visually evident. Do not name real people or copyrighted characters/franchises -- describe their visual traits instead.

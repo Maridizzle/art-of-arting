@@ -150,7 +150,7 @@ const CSS=`
 .ab .lint{font-family:var(--dm);font-size:.65rem;padding:.38rem .6rem;border-radius:7px;background:rgba(255,96,128,.13);border:1px solid rgba(255,77,110,.5);color:var(--bad);line-height:1.4}
 .ab .lint b{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.1rem}
 
-/* Variation card — structured sentence layout */
+/* Variation card -- structured sentence layout */
 .ab .vcard{background:rgba(40,0,80,.55);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:9px}
 .ab .vcard-head{font-family:var(--dm);font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mag);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .ab .vsections{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
@@ -356,9 +356,9 @@ function SmartFill({mode,d,setD,aiLoad}){
     setSrc("ai");
     try{
       const result=await routeText(mode,v);
-      if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response — try rephrasing.");setLoading(false);return;}
+      if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
       applyResult(result);
-    }catch(e){setErr("Parse failed — check your input or try again.");}
+    }catch(e){setErr("Parse failed -- check your input or try again.");}
     setLoading(false);
   };
   return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":"✦ AI parsed"}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
@@ -408,7 +408,7 @@ function ImageAnalyze({mode,setD}){
       applyResult(result);
       setDone(true);
     }catch(e){
-      setErr(e.message==="MODEL_DECLINED"?"The model declined to analyze this image.":"Analysis failed — "+(e.message||"try again."));
+      setErr(e.message==="MODEL_DECLINED"?"The model declined to analyze this image.":"Analysis failed -- "+(e.message||"try again."));
     }
     setLoading(false);
   };
@@ -455,7 +455,7 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
   const ac=cat=>aiChips[cat]||[];
   const cg=(opts,k)=><ChipGroup opts={opts} sel={d[k]||[]} onToggle={x=>ta(k,x)} onAdd={x=>up(k,[...(d[k]||[]),x])}/>;
   const AiBtn=({label})=>(<button className="aibtn" disabled={aiLoad||!(d.theme||d.concept||"").trim()} onClick={onAiPull}>{aiLoad?<><div className="pulse"/>{label}…</>:"✦ "+label}</button>);
-  if(mode==="image")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Core"><Lbl>Subject — [ADVES] [ACHARS] [GENGIRL]</Lbl><input className="fi" value={d.subject||""} onChange={e=>up("subject",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><Lbl>Action</Lbl><input className="fi" value={d.action||""} onChange={e=>up("action",e.target.value)} placeholder="[ACTION], [ACTION2], or describe…"/><Lbl>Scene</Lbl><input className="fi" value={d.scene||""} onChange={e=>up("scene",e.target.value)} placeholder="[SCEN_FANTASY], [SCENERY], or describe…"/><Lbl>Props</Lbl><input className="fi" value={d.props||""} onChange={e=>up("props",e.target.value)} placeholder="key objects in frame"/></Sec><Sec title="Style"><Lbl>Color Palette</Lbl>{cg(PAL,"palette")}<Lbl>Emotion → physical</Lbl><ChipGroup opts={EMO} sel={d.emotion||[]} onToggle={toggleEmo} onAdd={t=>toggleEmo({l:t,r:t})} showRender/><Lbl>Medium — [RANDART] [MXM] [VESTOOL]</Lbl><input className="fi" value={d.medium||""} onChange={e=>up("medium",e.target.value)} placeholder="alcohol ink, oil painting — or [RANDART]"/><Tog on={!!d.overridePhoto} onClick={()=>up("overridePhoto",!d.overridePhoto)} label="Override default photorealism"/></Sec><Sec title="Extras"><Lbl>Ideas — [SOUP] [WEATHER] [SKYWOW] [RIMBA]</Lbl><textarea className="fi" rows={2} value={d.ideas||""} onChange={e=>up("ideas",e.target.value)} placeholder="[RIMBA], [WEATHER], [SOUP3]…"/><Lbl>Inspiration threads</Lbl>{(d.inspirations||[""]).map((v,i)=>(<div className="ce" key={i}><input className="fi" value={v} placeholder={"thread "+(i+1)+"…"} onChange={e=>{const n=[...(d.inspirations||[""])];n[i]=e.target.value;up("inspirations",n);}}/>{(d.inspirations||[""]).length>1&&<button className="xbtn" onClick={()=>up("inspirations",(d.inspirations||[]).filter((_,j)=>j!==i))}>✕</button>}</div>))}{(d.inspirations||[""]).length<5&&<button className="addc" onClick={()=>up("inspirations",[...(d.inspirations||[""]),""]) }>+ add</button>}</Sec></>);
+  if(mode==="image")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Core"><Lbl>Subject -- [ADVES] [ACHARS] [GENGIRL]</Lbl><input className="fi" value={d.subject||""} onChange={e=>up("subject",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><Lbl>Action</Lbl><input className="fi" value={d.action||""} onChange={e=>up("action",e.target.value)} placeholder="[ACTION], [ACTION2], or describe…"/><Lbl>Scene</Lbl><input className="fi" value={d.scene||""} onChange={e=>up("scene",e.target.value)} placeholder="[SCEN_FANTASY], [SCENERY], or describe…"/><Lbl>Props</Lbl><input className="fi" value={d.props||""} onChange={e=>up("props",e.target.value)} placeholder="key objects in frame"/></Sec><Sec title="Style"><Lbl>Color Palette</Lbl>{cg(PAL,"palette")}<Lbl>Emotion → physical</Lbl><ChipGroup opts={EMO} sel={d.emotion||[]} onToggle={toggleEmo} onAdd={t=>toggleEmo({l:t,r:t})} showRender/><Lbl>Medium -- [RANDART] [MXM] [VESTOOL]</Lbl><input className="fi" value={d.medium||""} onChange={e=>up("medium",e.target.value)} placeholder="alcohol ink, oil painting -- or [RANDART]"/><Tog on={!!d.overridePhoto} onClick={()=>up("overridePhoto",!d.overridePhoto)} label="Override default photorealism"/></Sec><Sec title="Extras"><Lbl>Ideas -- [SOUP] [WEATHER] [SKYWOW] [RIMBA]</Lbl><textarea className="fi" rows={2} value={d.ideas||""} onChange={e=>up("ideas",e.target.value)} placeholder="[RIMBA], [WEATHER], [SOUP3]…"/><Lbl>Inspiration threads</Lbl>{(d.inspirations||[""]).map((v,i)=>(<div className="ce" key={i}><input className="fi" value={v} placeholder={"thread "+(i+1)+"…"} onChange={e=>{const n=[...(d.inspirations||[""])];n[i]=e.target.value;up("inspirations",n);}}/>{(d.inspirations||[""]).length>1&&<button className="xbtn" onClick={()=>up("inspirations",(d.inspirations||[]).filter((_,j)=>j!==i))}>✕</button>}</div>))}{(d.inspirations||[""]).length<5&&<button className="addc" onClick={()=>up("inspirations",[...(d.inspirations||[""]),""]) }>+ add</button>}</Sec></>);
   if(mode==="overlay"){
     const ovChips = Object.keys(aiChips).length>0 ? aiChips : OV_DEFAULTS;
     const ovCats = [
@@ -472,7 +472,7 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
         <AiBtn label={Object.keys(aiChips).length>0?"Re-search theme":"Search theme for chips"}/>
         {aiErr&&<div className="err">{aiErr}</div>}
         {Object.keys(aiChips).length>0&&<div className="aiok">✓ Chips filtered for: {d.theme}</div>}
-        {Object.keys(aiChips).length===0&&<div className="ainote">Showing defaults — search a theme to narrow chips</div>}
+        {Object.keys(aiChips).length===0&&<div className="ainote">Showing defaults -- search a theme to narrow chips</div>}
       </Sec>
       {ovCats.map(({key,label})=>(
         <Sec key={key} title={label}>
@@ -487,12 +487,12 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
     </>);
   }
   if(mode==="costume")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept"><input className="fi" value={d.theme||""} onChange={e=>up("theme",e.target.value)} placeholder="Victorian deep sea diver"/><AiBtn label="Generate costume ideas"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Ideas loaded</div>}</Sec>{["top","bottoms","shoes","accessories"].map(cat=>(<Sec key={cat} title={cat.charAt(0).toUpperCase()+cat.slice(1)}>{ac(cat).length>0&&<p className="ainote">AI suggestions:</p>}<ChipGroup opts={ac(cat)} sel={d[cat+"_sel"]||[]} onToggle={x=>ta(cat+"_sel",x)} onAdd={x=>up(cat+"_sel",[...(d[cat+"_sel"]||[]),x])}/></Sec>))}<Sec title="Mood / Vibe"><textarea className="fi" rows={2} value={d.vibe||""} onChange={e=>up("vibe",e.target.value)} placeholder="weathered, practical…"/></Sec></>);
-  if(mode==="character")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept — [ADVES] [ADELYRIA] [ACHARS]"><input className="fi" value={d.concept||""} onChange={e=>up("concept",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><AiBtn label="Populate from concept"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Options loaded</div>}</Sec><Sec title="Foundation"><div className="slbl">Species</div>{cg([...SPECIES_D,...ac("species")],"species")}<div className="slbl">Body</div>{cg([...BODY_D,...ac("body")],"body")}<div className="slbl">Age feel</div>{cg([...AGE_D,...ac("age")],"age")}</Sec><Sec title="Appearance"><div className="slbl">Skin</div>{cg([...SKIN_D,...ac("skin")],"skin")}<div className="slbl">Eyes</div>{cg([...EYES_D,...ac("eyes")],"eyes")}<div className="slbl">Hair</div>{cg([...HAIR_D,...ac("hair")],"hair")}</Sec><Sec title="Identity"><div className="slbl">Archetype</div>{cg([...ARCH_D,...ac("archetype")],"archetype")}<div className="slbl">World</div>{cg([...WORLD_D,...ac("world")],"world")}</Sec><Sec title="Details"><Lbl>Defining marks</Lbl><input className="fi" value={d.marks||""} onChange={e=>up("marks",e.target.value)} placeholder="deep scar, bioluminescent tattoos…"/><div className="slbl">Expression</div>{cg([...EXPR_D,...ac("expression")],"expression")}</Sec></>);
-  if(mode==="scene")return(<><Sec title="Characters — [ACHARS] [DGDRESSED]">{(d.characters||[""]).map((v,i)=>(<div className="ce" key={i}><input className="fi" value={v} placeholder={"Character "+(i+1)+" — or [ADVES]"} onChange={e=>{const n=[...(d.characters||[""])];n[i]=e.target.value;up("characters",n);}}/>{(d.characters||[""]).length>1&&<button className="xbtn" onClick={()=>up("characters",(d.characters||[]).filter((_,j)=>j!==i))}>✕</button>}</div>))}{(d.characters||[""]).length<6&&<button className="addc" onClick={()=>up("characters",[...(d.characters||[""]),""]) }>+ add character</button>}</Sec><Sec title="Setting"><Lbl>Environment — [SCENERY]</Lbl><textarea className="fi" rows={2} value={d.environment||""} onChange={e=>up("environment",e.target.value)} placeholder="[SCEN_RUINS], [SCEN_URBAN]…"/><Lbl>Action Level</Lbl><textarea className="fi" rows={2} value={d.action_level||""} onChange={e=>up("action_level",e.target.value)} placeholder="tense standoff — or [ACTION]"/></Sec><Sec title="Lighting — [RIMBA] [WEATHER]">{cg(LIGHTING,"lighting")}</Sec></>);
+  if(mode==="character")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept -- [ADVES] [ADELYRIA] [ACHARS]"><input className="fi" value={d.concept||""} onChange={e=>up("concept",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><AiBtn label="Populate from concept"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Options loaded</div>}</Sec><Sec title="Foundation"><div className="slbl">Species</div>{cg([...SPECIES_D,...ac("species")],"species")}<div className="slbl">Body</div>{cg([...BODY_D,...ac("body")],"body")}<div className="slbl">Age feel</div>{cg([...AGE_D,...ac("age")],"age")}</Sec><Sec title="Appearance"><div className="slbl">Skin</div>{cg([...SKIN_D,...ac("skin")],"skin")}<div className="slbl">Eyes</div>{cg([...EYES_D,...ac("eyes")],"eyes")}<div className="slbl">Hair</div>{cg([...HAIR_D,...ac("hair")],"hair")}</Sec><Sec title="Identity"><div className="slbl">Archetype</div>{cg([...ARCH_D,...ac("archetype")],"archetype")}<div className="slbl">World</div>{cg([...WORLD_D,...ac("world")],"world")}</Sec><Sec title="Details"><Lbl>Defining marks</Lbl><input className="fi" value={d.marks||""} onChange={e=>up("marks",e.target.value)} placeholder="deep scar, bioluminescent tattoos…"/><div className="slbl">Expression</div>{cg([...EXPR_D,...ac("expression")],"expression")}</Sec></>);
+  if(mode==="scene")return(<><Sec title="Characters -- [ACHARS] [DGDRESSED]">{(d.characters||[""]).map((v,i)=>(<div className="ce" key={i}><input className="fi" value={v} placeholder={"Character "+(i+1)+" -- or [ADVES]"} onChange={e=>{const n=[...(d.characters||[""])];n[i]=e.target.value;up("characters",n);}}/>{(d.characters||[""]).length>1&&<button className="xbtn" onClick={()=>up("characters",(d.characters||[]).filter((_,j)=>j!==i))}>✕</button>}</div>))}{(d.characters||[""]).length<6&&<button className="addc" onClick={()=>up("characters",[...(d.characters||[""]),""]) }>+ add character</button>}</Sec><Sec title="Setting"><Lbl>Environment -- [SCENERY]</Lbl><textarea className="fi" rows={2} value={d.environment||""} onChange={e=>up("environment",e.target.value)} placeholder="[SCEN_RUINS], [SCEN_URBAN]…"/><Lbl>Action Level</Lbl><textarea className="fi" rows={2} value={d.action_level||""} onChange={e=>up("action_level",e.target.value)} placeholder="tense standoff -- or [ACTION]"/></Sec><Sec title="Lighting -- [RIMBA] [WEATHER]">{cg(LIGHTING,"lighting")}</Sec></>);
   return null;
 }
 
-// ---- Variation Card — structured sentences ----
+// ---- Variation Card -- structured sentences ----
 function VariationCard({sections,idx,onCopySection,onCopyAll,cpState}){
   return(
     <div className="vcard">
@@ -569,8 +569,8 @@ export default function App(){
       setVars(parsed);
     }catch(e){
       setGenErr(e.message==="MODEL_DECLINED"
-        ?"The model declined — try softening the wording."
-        :"Generation failed — "+(e.message||"try again."));
+        ?"The model declined -- try softening the wording."
+        :"Generation failed -- "+(e.message||"try again."));
     }
     setLoading(false);
   };
@@ -599,7 +599,7 @@ export default function App(){
           <div className="tabs">{Object.entries(MMETA).map(([k,label])=>(<button key={k} className={"tab"+(mode===k?" on":"")} onClick={()=>switchMode(k)}>{label}</button>))}</div>
           <div className="tbstatus">
             {tbCount>0&&<span className="tbok">✦ Toolbox: {tbCount} tags · {chunks.filter(c=>c.trim()).length}/{TOTAL_PAGES} pages{activeTags.length>0&&<span> · {activeTags.map(t=><span key={t} className="tagpill">{t}</span>)}</span>}</span>}
-            {tbCount===0&&<span className="tbwait">○ Toolbox empty — paste pages below</span>}
+            {tbCount===0&&<span className="tbwait">○ Toolbox empty -- paste pages below</span>}
           </div>
           <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap",alignItems:"center"}}>
             <button className="uploadbtn" onClick={()=>setShowLoader(l=>!l)}>{showLoader?"▲ Hide loader":"⬆ Paste pages"}</button>
