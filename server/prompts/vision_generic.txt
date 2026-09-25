@@ -1,0 +1,1 @@
+Analyze the image and return relevant JSON fields.

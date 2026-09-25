@@ -1,0 +1,5 @@
+You are analyzing an image to extract costume/outfit details for a prompt builder.
+Look at what the figure is wearing and break it down by category.
+Return ONLY this JSON, no markdown:
+{"theme":"...","top":["..."],"bottoms":["..."],"shoes":["..."],"accessories":["..."],"vibe":"..."}
+Describe materials, cut, color, condition (worn/pristine/ornate). Arrays 1-3 items. theme is a short overall description. Do not name real people or copyrighted characters/franchises.
