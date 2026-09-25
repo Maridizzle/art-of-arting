@@ -3,7 +3,7 @@ MODE: Scene
 OUTPUT SHAPE
 Each variation is exactly six segments separated by ;; with this order and nothing else:
 subject;;action;;scene;;props;;color palette;;mood
-The subject segment names every character in the cast. Each segment is plain prose. An empty segment stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels. In a landscape-weighted scene the scene segment carries the weight and the cast reads as small figures inside it.
+The subject segment names every character in the cast. Each filled segment is developed prose under the EXPAND rule. A segment with no input stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels. In a landscape-weighted scene the scene segment carries the weight and the cast reads as small figures inside it.
 
 VARIATIONS
 Three variations. All three use all of the input. Variation 1 shifts distance (close versus wide). Variation 2 shifts tension level. Variation 3 shifts time of day. When the input carries separate labeled blocks per variation, each variation uses only its own block.

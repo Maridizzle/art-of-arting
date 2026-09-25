@@ -336,7 +336,9 @@ const Tog=({on,onClick,label})=><div className={"tog"+(on?" on":"")} onClick={on
 const Sec=({title,children})=><div className="sec"><div className="sectl">{title}</div>{children}</div>;
 const Lbl=({children})=><div className="lbl">{children}</div>;
 
-function SmartFill({mode,d,setD,aiLoad}){
+// Modes whose page fills from AI suggestions: after routing, Parse also pulls them so one tap fills the page.
+const CHIP_MODES=new Set(["costume","character","overlay"]);
+function SmartFill({mode,d,setD,aiLoad,onAiPull}){
   const[v,setV]=useState("");const[loading,setLoading]=useState(false);const[err,setErr]=useState("");const[src,setSrc]=useState("");
   const applyResult=(result)=>{
     setD(prev=>{
@@ -354,12 +356,14 @@ function SmartFill({mode,d,setD,aiLoad}){
     setLoading(true);setErr("");setSrc("");
     const tagCount=(v.match(/\[[A-Z_][A-Z0-9_]*\]/g)||[]).length;
     const tagRatio=tagCount/Math.max(v.trim().split(/\s+/).length,1);
-    if(tagRatio>=0.5){setSrc("local");applyResult(localRoute(v,mode));setLoading(false);return;}
+    const chain=(result)=>{if(!CHIP_MODES.has(mode)||!onAiPull)return;const ctx=(result.theme||result.concept||v).trim();if(ctx)onAiPull(ctx);};
+    if(tagRatio>=0.5){setSrc("local");const r=localRoute(v,mode);applyResult(r);setLoading(false);chain(r);return;}
     setSrc("ai");
     try{
       const result=await routeText(mode,v);
       if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
       applyResult(result);
+      chain(result);
     }catch(e){setErr("Parse failed -- check your input or try again.");}
     setLoading(false);
   };
@@ -553,8 +557,10 @@ export default function App(){
   const toggleEmo=(o)=>setD(p=>({...p,emotion:(p.emotion||[]).some(x=>x.l===o.l)?(p.emotion||[]).filter(x=>x.l!==o.l):[...(p.emotion||[]),o]}));
   const switchMode=m=>{setMode(m);setD({});setAiChips({});setVars([]);setGenErr("");setAiErr("");};
 
-  const doAiPull=async()=>{
-    const ctx=(d.theme||d.concept||"").trim();if(!ctx)return;
+  // ctxOverride lets Smart Fill pass the just-routed text before React state has caught up.
+  // The button passes a click event here, which is ignored.
+  const doAiPull=async(ctxOverride)=>{
+    const ctx=(typeof ctxOverride==="string"?ctxOverride:(d.theme||d.concept||"")).trim();if(!ctx)return;
     setAiLoad(true);setAiErr("");
     try{
       setAiChips(await pullChips(mode,ctx));
@@ -624,7 +630,7 @@ export default function App(){
         </div>
         <div className="bd">
           <div>
-            <SmartFill mode={mode} d={d} setD={setD} aiLoad={aiLoad}/>
+            <SmartFill mode={mode} d={d} setD={setD} aiLoad={aiLoad} onAiPull={doAiPull}/>
             <ModeFields mode={mode} d={d} up={up} toggleArr={toggleArr} toggleEmo={toggleEmo} aiChips={aiChips} onAiPull={doAiPull} aiLoad={aiLoad} aiErr={aiErr} setD={setD}/>
           </div>
           <div className="sb">
