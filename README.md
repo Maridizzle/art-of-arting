@@ -24,7 +24,9 @@ npm run dev:server        # terminal 1, Express on :8787
 npm run dev:client        # terminal 2, Vite on :5173, proxies /api to :8787
 ```
 
-Production: `npm run build` then `npm start`. The server serves `dist/` itself on one port.
+Production on a host that supplies variables itself (Railway): `npm run build` then `npm start`. The server serves `dist/` itself on one port.
+
+Production on your own machine with a `.env` file: `npm run build` then `npm run start:local`.
 
 `.env` is git-ignored. Never commit it.
 
