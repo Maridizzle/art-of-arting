@@ -296,13 +296,29 @@ function flattenVariation(sections,mode){
   return sections.map(s=>s.sentence).join(join);
 }
 
-function lint(preview,d){
-  const txt=(preview+" "+Object.values(d).flat().filter(v=>typeof v==='string').join(" ")).toLowerCase();
+const NEG_RE=/\b(no|not|none|without|instead of|rather than|never|avoid|none of|free of|devoid)\b/;
+function lintText(txt){
   const w=[];
-  if(/\b(no|not|none|without|instead of|rather than|never|avoid)\b/.test(txt))w.push({law:"Law I · Never negate",msg:"Negation detected — describe what IS present."});
-  if(/\bor\b/.test(txt)&&!/\[/.test(txt))w.push({law:"Law V · Lock choices",msg:'"or" fork — pick one.'});
-  if(/\b\d+\s?(mm|cm|k|kelvin|years?|°|px)\b/.test(txt))w.push({law:"Law V · No numbers",msg:"Measurement detected — use sensory language."});
-  if(/\b(feeling of|energy of|sense of|vibe of|essence of)\b/.test(txt))w.push({law:"Law IV · Physical only",msg:"Abstract word — use Emotion chips instead."});
+  if(NEG_RE.test(txt))w.push({law:"Law I · Never negate",msg:"Negation detected. Describe what IS present."});
+  if(/\bor\b/.test(txt))w.push({law:"Law V · Lock choices",msg:'"or" fork. Pick one.'});
+  if(/\b\d+\s?(mm|cm|k|kelvin|years?|°|px)\b/.test(txt))w.push({law:"Law V · No numbers",msg:"Measurement detected. Use sensory language."});
+  if(/\b(feeling of|energy of|sense of|vibe of|essence of)\b/.test(txt))w.push({law:"Law IV · Physical only",msg:"Abstract word. Use Emotion chips instead."});
+  return w;
+}
+// Lint runs on resolved text (after [TAG] expansion) so a clean scene cannot
+// hide a negation inherited from a toolbox block. Each warning lists the tags
+// whose own block trips the same law, so the fix lands in the right file.
+function lint(resolvedPreview,rd,tags,map){
+  const txt=(resolvedPreview+" "+Object.values(rd).flat().filter(v=>typeof v==='string').join(" ")).toLowerCase();
+  const w=lintText(txt);
+  if(!w.length)return w;
+  for(const t of tags){
+    const key=t.replace(/[\[\]]/g,'');if(!map[key])continue;
+    for(const h of lintText(resolveTag(key,map).toLowerCase())){
+      const m=w.find(x=>x.law===h.law);
+      if(m){m.from=m.from||[];if(!m.from.includes(t))m.from.push(t);}
+    }
+  }
   return w;
 }
 
@@ -568,8 +584,8 @@ export default function App(){
   const resolvedPreviewData=useMemo(()=>resolveData(d,toolbox),[d,mode,toolbox]);
   const resolvedPreview=useMemo(()=>buildPreview(resolvedPreviewData,mode),[resolvedPreviewData,mode]);
   const preview=useMemo(()=>emitRaw?buildPreview(d,mode):resolvedPreview,[emitRaw,d,mode,resolvedPreview]);
-  const warnings=useMemo(()=>lint(preview,d),[preview,d]);
   const activeTags=useMemo(()=>[...new Set((Object.values(d).flat().filter(v=>typeof v==='string').join(' ')).match(/\[([A-Z_][A-Z0-9_]+)\]/g)||[])],[d]);
+  const warnings=useMemo(()=>lint(resolvedPreview,resolvedPreviewData,activeTags,toolbox),[resolvedPreview,resolvedPreviewData,activeTags,toolbox]);
 
   return(
     <div className="ab">
@@ -617,7 +633,7 @@ export default function App(){
               </div>
               <div className="pvtxt">{preview||<span className="ph">fill fields… [TAG] calls toolbox</span>}</div>
             </div>
-            {warnings.length>0&&<div className="lints">{warnings.map((w,i)=><div key={i} className="lint"><b>{w.law}</b>{w.msg}</div>)}</div>}
+            {warnings.length>0&&<div className="lints">{warnings.map((w,i)=><div key={i} className="lint"><b>{w.law}</b>{w.msg}{w.from?.length>0&&<span> · from {w.from.join(', ')}</span>}</div>)}</div>}
             <button className="genbtn" onClick={doGenerate} disabled={loading}>{loading?"Generating…":"✦ Generate 3 variations"}</button>
             {genErr&&<div className="err">{genErr}</div>}
             {vars.map((sections,i)=>(
