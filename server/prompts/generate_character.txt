@@ -1,0 +1,12 @@
+MODE: Character
+
+OUTPUT SHAPE
+Each variation is exactly six segments separated by ;; with this order and nothing else:
+subject;;action;;scene;;props;;color palette;;mood
+The subject segment carries the full character block: species, build, age feel, skin, eyes, hair, marks, archetype. Each segment is plain prose. An empty segment stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels.
+
+VARIATIONS
+Three variations. All three use all of the input. Variation 1 shifts expression. Variation 2 shifts pose. Variation 3 shifts lighting. When the input carries separate labeled blocks per variation, each variation uses only its own block.
+
+RETURN ONLY THIS JSON, no markdown:
+{"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}

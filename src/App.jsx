@@ -57,13 +57,8 @@ const OV_DEFAULTS = {
 // Overlay chip prompt now lives in server/prompts/chips_overlay.txt.
 
 // Section labels for display
-const SECTION_LABELS = {
-  image:     ["Style & Medium","Subject","Action","Environment","Palette & Light","Mood & Lens"],
-  overlay:   ["Style & Medium","Surface","Light Behavior","Mood & Palette"],
-  costume:   ["Style","Garments","Accessories","Mood"],
-  character: ["Style & Medium","Figure","Features","Archetype & World","Expression & Marks"],
-  scene:     ["Style & Medium","Cast","Setting","Action & Tension","Light & Mood"],
-};
+// Locked six-segment contract: subject;;action;;scene;;props;;color palette;;mood
+const SEG_LABELS=["Subject","Action","Scene","Props","Color palette","Mood"];
 
 const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..600&family=Hanken+Grotesk:wght@300..800&family=JetBrains+Mono:wght@400;500;700&display=swap');
@@ -281,29 +276,24 @@ function buildGenPromptVaried(rd1,rd2,rd3,mode){
   return`=== VARIATION 1 INPUTS ===\n${p1}\n\n=== VARIATION 2 INPUTS ===\n${p2}\n\n=== VARIATION 3 INPUTS ===\n${p3}\n\nGenerate exactly 3 variations, each using only its own labeled inputs.`;
 }
 
-// --- NEW: parse structured variation response ---
-// Expected format per variation: array of {label, sentence} objects
-// JSON schema: { variations: [ [{label,sentence},...], [...], [...] ] }
-function parseSections(raw){
-  // raw is either already an array of {label,sentence} or a flat string
+// Parse one variation into labeled sections.
+// Overlay: one flowing paragraph. Every other mode: the six ;; segments.
+// Line breaks are collapsed because they fracture Perchance blocks.
+function parseSections(raw,mode){
   if(Array.isArray(raw))return raw;
-  if(typeof raw==='string'){
-    // Try to split on newlines with "LABEL: sentence" pattern
-    const lines=raw.split(/\n+/).filter(l=>l.trim());
-    const sections=[];
-    for(const l of lines){
-      const m=l.match(/^([A-Za-z &]+?):\s*(.+)$/);
-      if(m)sections.push({label:m[1].trim(),sentence:m[2].trim()});
-      else if(sections.length)sections[sections.length-1].sentence+=' '+l.trim();
-    }
-    if(sections.length)return sections;
-    return [{label:"Prompt",sentence:raw}];
-  }
-  return[];
+  if(typeof raw!=='string')return[];
+  const text=raw.replace(/\s*\n+\s*/g,' ').trim();
+  if(mode==='overlay')return[{label:"Overlay",sentence:text}];
+  const parts=text.split(';;').map(s=>s.trim());
+  if(parts.length>6)parts.splice(5,parts.length-5,parts.slice(5).join(' '));
+  while(parts.length<6)parts.push('');
+  return parts.map((sentence,i)=>({label:SEG_LABELS[i],sentence}));
 }
 
-function flattenVariation(sections){
-  return sections.map(s=>s.sentence).join(' ');
+// Rebuild the copyable block: ;; walls stay so the segment count is always six.
+function flattenVariation(sections,mode){
+  const join=mode==='overlay'?' ':';;';
+  return sections.map(s=>s.sentence).join(join);
 }
 
 function lint(preview,d){
@@ -488,7 +478,6 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
 
 // ---- Variation Card — structured sentences ----
 function VariationCard({sections,idx,onCopySection,onCopyAll,cpState}){
-  const labels=SECTION_LABELS;
   return(
     <div className="vcard">
       <div className="vcard-head">
@@ -559,8 +548,7 @@ export default function App(){
     try{
       const rd1=resolveData(d,toolbox),rd2=resolveData(d,toolbox),rd3=resolveData(d,toolbox);
       const result=await generate(mode,buildGenPromptVaried(rd1,rd2,rd3,mode));
-      // result.variations is array of arrays of {label,sentence}
-      const parsed=(result.variations||[]).map(v=>parseSections(v));
+      const parsed=(result.variations||[]).map(v=>parseSections(v,mode));
       setVars(parsed);
     }catch(e){
       setGenErr(e.message==="MODEL_DECLINED"
@@ -571,7 +559,7 @@ export default function App(){
   };
 
   const doCopyAll=async(idx)=>{
-    const text=vars[idx].map(s=>s.sentence).join('\n\n');
+    const text=flattenVariation(vars[idx],mode);
     try{await navigator.clipboard.writeText(text);}catch{if(taRef.current){taRef.current.value=text;taRef.current.select();document.execCommand("copy");}}
     setCpState(`all-${idx}`);setTimeout(()=>setCpState(null),1600);
   };

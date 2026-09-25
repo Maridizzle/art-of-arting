@@ -100,7 +100,9 @@ app.post("/api/generate", asyncRoute(async (req, res) => {
   const mode = requireMode(req.body.mode);
   const input = String(req.body.input || "");
   if (!input.trim()) throw new Error("input is required");
-  const raw = await send({ system: prompt("generate", { mode }), messages: [{ role: "user", content: input }], maxTokens: 2400 });
+  // Shared preamble (the five laws and syntax rules) followed by the mode's own output contract.
+  const system = prompt("preamble") + "\n\n" + prompt("generate_" + mode);
+  const raw = await send({ system, messages: [{ role: "user", content: input }], maxTokens: 2400 });
   res.json(parseModelJson(raw));
 }));
 

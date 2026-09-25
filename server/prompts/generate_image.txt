@@ -1,0 +1,13 @@
+MODE: Standalone Image
+
+OUTPUT SHAPE
+Each variation is exactly six segments separated by ;; with this order and nothing else:
+subject;;action;;scene;;props;;color palette;;mood
+Each segment is plain prose. An empty segment stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels, no sentence numbering.
+The medium cue, when given, opens the subject segment.
+
+VARIATIONS
+Three variations. All three use all of the input. Variation 1 shifts compositional distance (close versus wide). Variation 2 shifts light temperature (warm versus cold). Variation 3 shifts camera angle. When the input carries separate labeled blocks per variation, each variation uses only its own block.
+
+RETURN ONLY THIS JSON, no markdown:
+{"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}
