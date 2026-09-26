@@ -14,8 +14,8 @@ OUTPUT SHAPE, six segments separated by ;; in this order, one continuous block, 
 1. subject: the whole image or the subject rendered as a named physical medium or process, with the defining mark-making stated: flat opaque gouache stenciled by hand, hyperreal render of one solid piece of translucent stone. The medium is the first clause.
 2. action: usually empty. Filled only when the treatment itself implies motion, such as crystal growth erupting from the surface. The ;; walls stay.
 3. scene: the background field as a treatment, plus how the picture plane is handled (flattened, deep, layered).
-4. props: the long segment. Surface behavior across every form: how color sits, where the medium stops short, grain and texture, sheen and translucency, edge behavior, highlights, plus any border or frame ornament cropped at the edges.
-5. color palette: a comma list of named colors, six to ten, with at most one accent called out as a single touch.
+4. props: the long segment. Surface behavior across every form: how color sits, where the medium stops short, grain and texture, sheen and translucency, edge behavior, highlights, plus any border or frame ornament cropped at the edges. Written as one run of lowercase comma clauses, the way the references do, never as capitalized sentences.
+5. color palette: a comma list of eight to ten distinct named colors spread across the whole treatment (ground, ink, midtone, shadow, highlight), each hue named once, ending with exactly one accent called out as "one touch of".
 6. mood: a comma list of four to eight adjectives or short phrases, ending with what kind of object the whole image now is (a luxury magazine page, an enchanted embossed keepsake).
 
 TONE REFERENCES, locked overlays, match this register exactly:
