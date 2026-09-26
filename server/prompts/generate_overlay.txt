@@ -1,12 +1,38 @@
 MODE: Overlay
 
-An overlay is a subject-agnostic surface filter that stacks on any scene. It describes surface conditions and material states only.
+An overlay is a treatment applied to whatever image it is stacked on. It describes how every form, surface, and field in that image gets rendered. It never supplies the subject.
 
-OUTPUT SHAPE
-Each variation is one unlabeled continuous paragraph of three to four sentences that moves through medium, texture, color palette, atmospheric effect, mood, in that order. Zero line breaks. No ;; walls. No subject language at all: no figures, creatures, rooms, or objects (no woman, dragon, crowd, chamber, table). Only surfaces, materials, light behavior, and palette rules pass. Rings, halos, and portals read as cropped at the frame edge. Ornament is embedded in a material (etched into, pressed through, woven into) rather than floating as a structure. The paragraph opens with its medium cue as a physical process.
+THE SUBJECT IS A PLACEHOLDER. Refer to it only as "the subject", "every form", "the whole body", "the entire image", "each color", "the larger fields". Whatever the overlay is applied to fills that slot. In this mode the EXPAND rule applies to treatment, surface, and light only.
+
+WHAT MAY BE CONCRETE, and nothing else:
+- The background field, as a treatment: a single flat field of pale paper, a deep void-black matte, a stenciled patterned screen. One phrase.
+- Border, margin, and frame elements cropped at the frame edges: ruled frame lines, plate numbers, caption lettering, cushions or tassels cut by the edge, harlequin patterning worked into the border ornament.
+- Ornament embedded in a material: etched into, pressed through, woven into, worked into the border. Never floating as a structure.
+Every other noun must name a medium, a material, a mark, a surface condition, a color, or a light behavior. If an illustrator could draw it as an object in the scene, translate it into the condition it implies: wet limestone becomes a slick mineral sheen across every midtone; sunshafts through a canopy become narrow warm shafts breaking through green-black shadow.
+
+OUTPUT SHAPE, six segments separated by ;; in this order, one continuous block, zero line breaks:
+1. subject: the whole image or the subject rendered as a named physical medium or process, with the defining mark-making stated: flat opaque gouache stenciled by hand, hyperreal render of one solid piece of translucent stone. The medium is the first clause.
+2. action: usually empty. Filled only when the treatment itself implies motion, such as crystal growth erupting from the surface. The ;; walls stay.
+3. scene: the background field as a treatment, plus how the picture plane is handled (flattened, deep, layered).
+4. props: the long segment. Surface behavior across every form: how color sits, where the medium stops short, grain and texture, sheen and translucency, edge behavior, highlights, plus any border or frame ornament cropped at the edges.
+5. color palette: a comma list of named colors, six to ten, with at most one accent called out as a single touch.
+6. mood: a comma list of four to eight adjectives or short phrases, ending with what kind of object the whole image now is (a luxury magazine page, an enchanted embossed keepsake).
+
+TONE REFERENCES, locked overlays, match this register exactly:
+
+"the entire image rendered as a 1920s French pochoir fashion plate, every form stenciled by hand in flat opaque gouache with crisp hard-edged color shapes laid over a thin elegant black ink line drawing;;each color sitting as its own perfectly flat unshaded plane, tiny gaps of bare paper between neighboring colors where the stencils stopped short, soft stippled gradation brushed into a few areas, faint velvety pompon brush texture across the larger fields;;picture plane flattened and simplified into elongated elegant silhouettes, background reduced to a single flat field of pale paper with one stenciled patterned screen and a tasseled cushion cropped at the frame edges;;wide generous cream margin around the plate, a small printed plate number and a line of italic French caption lettering in the lower margin, diamond harlequin patterning and black silk pompoms worked into the border ornament, a thin gold and black ruled frame line;;ivory paper, lacquer black, chalk white, coral, jade green, lemon yellow, powder blue, dusty lilac, one touch of metallic gold;;clean flat daylight, poised, chic, theatrical, a luxury magazine page"
+
+"hyperreal high-detail 3D render of a subject carved from one solid piece of smooth translucent stone, with injections of geometric crystal growth erupting from the surface;;;;set against a deep void-black background, matte black surrounding the form, deepest recesses near-black so the iridescence reads brilliant against the dark;;the whole body one continuous piece of smooth semi-translucent stone that light passes partway through, angular stair-step hopper crystals erupting in clusters from the surface in terraced spiraling geometric steps, each crystal face sunken and hollowed in square recursive terraces, the entire surface sheathed in a shifting oil-slick iridescence like thin film on water, structural rainbow color flowing across the geometry in bands of magenta, gold, teal, electric blue, and violet, colors shifting from one hue to the next across every facet, bright specular glints catching on the sharpest stepped edges, deeper translucent stone glowing faintly within where the crystal is thickest;;iridescent magenta, gold, teal, electric blue, violet, oil-slick rainbow, over translucent stone, void-black;;alien, dazzling, geometric, jewel-like, otherworldly, mesmerizing"
+
+ALSO:
+- Rings, halos, and portals read as cropped at the frame edge, never centered.
+- Material contradictions give an overlay identity: an industrial finish with spring growth, an anti-counterfeit pattern rendered as beautiful.
+- Each variation carries its own distinct medium cue.
 
 VARIATIONS
 Three variations. All three use all of the input. Variation 1 shifts the medium. Variation 2 shifts light behavior. Variation 3 shifts the palette rule.
 
+Before returning, reread each variation and translate any drawable scene noun that slipped in, keeping only the background field and border elements allowed above.
+
 RETURN ONLY THIS JSON, no markdown:
-{"variations": ["paragraph 1", "paragraph 2", "paragraph 3"]}
+{"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}

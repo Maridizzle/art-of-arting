@@ -285,7 +285,8 @@ function parseSections(raw,mode){
   if(Array.isArray(raw))return raw;
   if(typeof raw!=='string')return[];
   const text=raw.replace(/\s*\n+\s*/g,' ').trim();
-  if(mode==='overlay')return[{label:"Overlay",sentence:text}];
+  // Overlays come back either as six segments (locked library shape) or as one paragraph.
+  if(mode==='overlay'&&!text.includes(';;'))return[{label:"Overlay",sentence:text}];
   const parts=text.split(';;').map(s=>s.trim());
   if(parts.length>6)parts.splice(5,parts.length-5,parts.slice(5).join(' '));
   while(parts.length<6)parts.push('');
@@ -293,9 +294,9 @@ function parseSections(raw,mode){
 }
 
 // Rebuild the copyable block: ;; walls stay so the segment count is always six.
-function flattenVariation(sections,mode){
-  const join=mode==='overlay'?' ':';;';
-  return sections.map(s=>s.sentence).join(join);
+function flattenVariation(sections){
+  if(sections.length===1)return sections[0].sentence;
+  return sections.map(s=>s.sentence).join(';;');
 }
 
 const NEG_RE=/\b(no|not|none|without|instead of|rather than|never|avoid|none of|free of|devoid)\b/;
