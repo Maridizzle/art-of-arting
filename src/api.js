@@ -20,6 +20,11 @@ async function post(path, body) {
   if (!res.ok || (data && data.error)) {
     throw new Error((data && data.error) || "Request failed (" + res.status + ")");
   }
+  // Which provider answered, from the X-Provider header. Non-enumerable so it never
+  // lands in the form state when a result is spread into the fields.
+  if (data && typeof data === "object") {
+    Object.defineProperty(data, "provider", { value: res.headers.get("X-Provider") || "", enumerable: false });
+  }
   return data;
 }
 
