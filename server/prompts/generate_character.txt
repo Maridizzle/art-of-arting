@@ -1,12 +1,50 @@
 MODE: Character
 
-OUTPUT SHAPE
-Each variation is exactly six segments separated by ;; with this order and nothing else:
-subject;;action;;scene;;props;;color palette;;mood
-The subject segment carries the full character block: species, build, age feel, skin, eyes, hair, marks, archetype. Attire, when given, goes in the props segment as worn garments. Setting, when given, goes in the scene segment. Each filled segment is developed prose under the EXPAND rule. A segment with no input stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels.
+A character is a toolbox block: one line in the form KEY = (block) that a Perchance generator expands wherever [KEY] appears. It fixes who the person is so that outfits, scenes, and overlays can change around them. In this mode the EXPAND rule applies to the body, face, hair, signature marks, and clothing bias only.
+
+OUTPUT SHAPE, one continuous line, zero line breaks:
+KEY = (Name; age and sex or species; skin; hair; eyes; build; marks and signature accessories; primary clothing style and palette; keep-constant anchors; vibe)
+
+- KEY is the key the input gives. When the input gives none, use the short name in capitals.
+- Order is priority. Name first, then the identity anchors that must never drift (hair, eyes, skin, a signature such as a choker, glasses, a tail, a scar), then build, then clothing as a style bias rather than one fixed outfit, then the anchors line, then the vibe.
+- Nested parentheses add emphasis, as in ((messy shoulder length poofed out) mane of hair). Two levels at most. Every parenthesis closes.
+- Curly braces with pipes give Perchance alternatives, as in {faint glowing scales| glowing runes| bolts of energy}, and a ^n weight marks the favored option, as in {^2||visible nipple}. Only in variation 3, only on hair and clothing.
+- Numbers are allowed for age and height in a block, the way the locked blocks use them. Everything else stays sensory.
+- The anchors line reads like: keep hair color/length, glasses, eye hue fixed while outfits shift. Then the vibe, introduced with a semicolon: ; serious, intelligent, nerdy vibe. Never an em dash.
+- Clothing is a bias: primary colors, weight, how revealing, one or two garment types. A full outfit belongs to Costume mode.
+- Setting from the input is left out. A block carries no place.
+- Attire from the input becomes the clothing bias, kept verbatim where it is already visual.
+- A block the input gives verbatim (a pasted sheet's own wording, a [TAG]) is kept verbatim.
+
+TONE REFERENCES, Maride's own locked AD blocks, match this register exactly. They predate the em dash rule; where a reference uses an em dash, the output uses a semicolon.
+
+ADELIZA = (Eliza, a young adult with wavy chestnut hair (soft side part), warm fair complexion, and deep brown eyes; composed modern presence with subtle studio polish; optional over-ear headphones as a signature cue; palette of refined reds and blacks with clean neutrals; crisp tailoring sensibility; upright, confident, approachable; keep facial structure, hair color/texture, and calm confidence consistent while wardrobe varies)
+
+ADELYRIA = (Elyria, 25 with long aqua-blue ponys in her hair and luminous teal eyes; translucent softly glowing wings and airy grace; iridescent highlights with opal accents; transparent full body blue fishnet bodysuit. revealing outfits, cool aqua/teal palette; gentle bloom and soft backlight; slightly bubbly, carefree, clumsy demeanor; primary clothing often sky-blue with sparkles; keep hair color/style, eye hue, and wing design consistent while outfits change)
+
+ADHE = (He; a 30 year old man with a long grey beard and long grey hair pulled back in a pony tail.  He is naked except for a thick blue bathrobe.)
+
+ADHER = (Her; a 30 year old woman with a short shock of bright green spiky hair.  She wears a white shirt with a red blouse over it unbuttoned and long flowing sunflower yellow skirt.  She is slender and beautiful with stunning green eyes.)
+
+ADISABELLA = (Isabella, a poised young woman with shoulder-length chestnut waves and warm golden-brown eyes; wears skimpy clothes, transparent materials, lace, intelligent, gracious presence with a relaxed self-assured smile; palette centered on sophisticated reds with understated gold; minimal tasteful jewelry; soft key with clean rim; keep hair length/color, default style: refined but revealing, low cut, exposed cleavage, short skirts, {^2||visible nipple}, eye color, and poised demeanor consistent as wardrobe shifts)
+
+ADLIORIA = (Lioria. a tall elf with cascading emerald-green hair, high-set pointed ears, and clear green eyes; default clothing: nude with green ribbons; clothes are dark green, very revealing with {^3|exposed nipples|visible labia} regal woodland-mage aura with gold filigree motifs and a gem-brooch cue; deep forest-green palette with brushed-gold accents; dignified, composed posture; subtle leaf/arcane line patterns as a thread; keep hair color/length, ear shape, and refined bearing constant while costumes vary)
+
+ADMARIS = (Maris, a pouting young adult with waist-length ash-blonde waves, vivid green eyes, and warm fair skin; graceful, kinetic, dancerly movement; pastel micro-accents and sticker-like motifs; palette soft pastels with clean whites, default outfit pastel pasties, transparent pastel skirt; natural light and playful sparkle; keep hair color/length, eye hue, and upbeat energy consistent while outfits change)
+
+ADQUILL = (Quill, a 7 foot tall wooden puppet fairy carved from pale birch, her joints delicately visible like a marionette’s, but her movements poised. Her hair is made of curling parchment ribbons in soft gold and ivory, pinned with a fountain pen nib. Her wings are translucent vellum etched with faint moving calligraphy. She often wears a gown sewn from folded resume pages, envelopes, and stitched letters, layered elegantly like paper feathers. Ink stains edge her fingertips, and a ribbon of inked script circles her neck like jewelry. — Large steel-gray eyes rimmed with gold.  She holds a brass fountain pen that glows faintly at the tip and a sealed leather briefcase embossed with ornate scrollwork.)
+
+ADQYRA = (Qyra is a beautiful mature woman with a smooth honey complexion exuding mature cyberpunk elegance; left side of her head is buzz-cut shaved with cybernetic tattoos barely visible beneath the thin layer of hair, the right side of her hair is chest-length long ombre hair from cyan to neon-green, flowing and wavy ; glowing lime eyes; luminous makeup; strong curvy build, full round breasts, curvy hips, shapely legs, in neon greens, blues and oranges vinyl fashion, elegant wraps and folds with straps, spikes, and chains; strappy stiletto boots; sexy and seductive, confident stance, cocky and self-assured.)
+
+ADSEREPHINA = (Serephina, a striking figure with a stylish purplish-indigo bob, wide sapphire eyes, and a fair complexion; elegant summoner energy with gothic romance; black transparent lace corset, visible areolas and layered ruffles as recurring textures; deep blacks with jewel-tone blues/violets; poised, measured gestures and refined contrast, she has a clumsy, cheeky demeanor with a slightly downcast face, eyes looking up at the viewer; keep hair color/style, eye color, and composed grace constant as wardrobe evolves)
 
 VARIATIONS
-Three variations. All three use all of the input. Variation 1 shifts expression. Variation 2 shifts pose. Variation 3 shifts lighting. When the input carries separate labeled blocks per variation, each variation uses only its own block.
+Three blocks for the same character, from the same input.
+Variation 1: compact anchor block, about 60 words. Name, the anchors that must never drift, clothing bias in one clause, anchors line, vibe.
+Variation 2: full block, about 120 words. Everything variation 1 has plus build, marks, expression, and a fuller clothing bias.
+Variation 3: full block with Perchance alternatives, about 130 words. The same as variation 2 with one {a|b|c} list on hair styling and one on clothing, three options each, every option consistent with the anchors.
+
+Before returning, reread each block: every parenthesis closes, the line has no line breaks, "or" appears nowhere, nothing is negated, the anchors line names the features that must stay fixed.
 
 RETURN ONLY THIS JSON, no markdown:
-{"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}
+{"variations": ["KEY = (...)", "KEY = (...)", "KEY = (...)"]}
