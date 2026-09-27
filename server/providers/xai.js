@@ -20,7 +20,9 @@ const base = (process.env.XAI_BASE_URL || "https://api.x.ai/v1").replace(/\/+$/,
 // Reasoning tokens are billed inside the output cap (usage reports reasoning_tokens under
 // output_tokens_details), so keep the floor generous.
 const outputFloor = Number(process.env.XAI_MAX_OUTPUT_TOKENS || 25000);
-const effort = process.env.XAI_REASONING_EFFORT || "medium";
+// Only some models take a reasoning effort (docs list levels for grok-4.7, none for
+// grok-4.20). Empty means send none and let the model use its own default.
+const effort = (process.env.XAI_REASONING_EFFORT || "").trim();
 
 if (!key) console.warn("[xai] XAI_API_KEY is not set; every model call will fail.");
 if (!model) console.warn("[xai] XAI_MODEL is not set; every model call will fail.");
@@ -51,18 +53,7 @@ function extractText(data) {
   return texts.join("");
 }
 
-export async function send({ system, messages, maxTokens = 1000 }) {
-  if (!key || !model) throw new Error("Server is missing XAI_API_KEY or XAI_MODEL");
-  const body = {
-    model,
-    store: false,
-    input: [
-      { role: "system", content: system },
-      ...messages.map(m => ({ role: m.role, content: toInputContent(m.content) })),
-    ],
-    max_output_tokens: Math.max(maxTokens, outputFloor),
-    reasoning: { effort },
-  };
+async function post(body) {
   const res = await fetch(base + "/responses", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
@@ -73,6 +64,34 @@ export async function send({ system, messages, maxTokens = 1000 }) {
   if (!res.ok || data.error) {
     const msg = data.error && (data.error.message || (typeof data.error === "string" ? data.error : null));
     throw new Error(msg || "xAI error " + res.status);
+  }
+  return data;
+}
+
+export async function send({ system, messages, maxTokens = 1000 }) {
+  if (!key || !model) throw new Error("Server is missing XAI_API_KEY or XAI_MODEL");
+  const body = {
+    model,
+    store: false,
+    input: [
+      { role: "system", content: system },
+      ...messages.map(m => ({ role: m.role, content: toInputContent(m.content) })),
+    ],
+    max_output_tokens: Math.max(maxTokens, outputFloor),
+  };
+  if (effort) body.reasoning = { effort };
+  let data;
+  try {
+    data = await post(body);
+  } catch (err) {
+    // A model that takes no effort parameter rejects the whole call. Retry once without it.
+    if (body.reasoning && /reasoning/i.test(err.message)) {
+      console.warn(`[xai] ${model} rejected reasoning effort "${effort}"; retrying without it. Clear XAI_REASONING_EFFORT to stop this warning.`);
+      delete body.reasoning;
+      data = await post(body);
+    } else {
+      throw err;
+    }
   }
   const text = extractText(data);
   if (data.status === "incomplete") {
