@@ -24,7 +24,8 @@ async function post(path, body) {
 }
 
 // Smart Fill: route free text into the mode's fields.
-export const routeText = (mode, text) => post("/route", { mode, text });
+// card=true marks a pasted character sheet (Character mode): extracted, not developed.
+export const routeText = (mode, text, card = false) => post("/route", { mode, text, card });
 
 // Chip pools for overlay / costume / character from a theme or concept.
 export const pullChips = (mode, context) => post("/chips", { mode, context });
