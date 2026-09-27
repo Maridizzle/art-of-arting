@@ -4,7 +4,8 @@
 const DECLINE_RE = /\b(can't|cannot|won't|unable to|not able to|I'm sorry|guidelines|decline)\b/i;
 // A refusal announces itself up front. Only the opening of the reply is checked so a
 // legitimate prompt that mentions "guidelines" further in is not misread as a decline.
-const looksDeclined = cleaned => DECLINE_RE.test(cleaned.slice(0, 80));
+// Curly apostrophes are normalized first: models write "can’t" as often as "can't".
+export const looksDeclined = text => DECLINE_RE.test(String(text || "").replace(/[‘’]/g, "'").slice(0, 80));
 
 export function stripFences(raw) {
   return String(raw || "").replace(/```json/gi, "").replace(/```/g, "").trim();

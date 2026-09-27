@@ -16,6 +16,8 @@
 //        /api/docs/guides/reasoning, /api/reference/resources/responses/methods/create
 
 // Trimmed: a stray space or newline pasted into a dashboard value would otherwise reach the API.
+import { looksDeclined } from "../parse.js";
+
 const key = (process.env.OPENAI_API_KEY || "").trim();
 const model = (process.env.OPENAI_MODEL || "").trim();
 const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -71,11 +73,26 @@ export async function send({ system, messages, maxTokens = 1000 }) {
   let data;
   try { data = await res.json(); } catch { throw new Error("OpenAI returned non-JSON (" + res.status + ")"); }
   if (!res.ok || data.error) {
-    throw new Error((data.error && data.error.message) || "OpenAI error " + res.status);
+    // A policy rejection arrives as an error, not a refusal part. Per the Responses
+    // reference the error codes include invalid_prompt, bio_policy and
+    // misalignment_policy_violation among others; any policy-shaped code is a decline.
+    const code = String((data.error && data.error.code) || "");
+    const message = (data.error && data.error.message) || "";
+    // Either a policy-shaped code or refusal wording in the message itself is a decline.
+    if (/invalid_prompt|policy|content_filter|safety/i.test(code) || looksDeclined(message)) {
+      console.warn("[openai] declined:", code || message.slice(0, 80));
+      throw new Error("MODEL_DECLINED");
+    }
+    throw new Error(message || "OpenAI error " + res.status);
   }
   const text = extractText(data);
   if (data.status === "incomplete") {
     const reason = (data.incomplete_details && data.incomplete_details.reason) || "unknown";
+    // content_filter is a decline delivered as a cut-off response, per the reference.
+    if (reason === "content_filter") {
+      console.warn("[openai] declined: response cut by content_filter");
+      throw new Error("MODEL_DECLINED");
+    }
     if (!text) throw new Error(`OpenAI stopped early (${reason}). Raise OPENAI_MAX_OUTPUT_TOKENS or lower OPENAI_REASONING_EFFORT.`);
     console.warn("[openai] response incomplete:", reason);
   }
