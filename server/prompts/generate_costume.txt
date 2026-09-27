@@ -1,12 +1,30 @@
 MODE: Costume
 
-OUTPUT SHAPE
-Each variation is exactly six segments separated by ;; with this order and nothing else:
-subject;;action;;scene;;props;;color palette;;mood
-The props segment carries the garments: top, bottoms, shoes, accessories, with material, cut, and condition. Each filled segment is developed prose under the EXPAND rule. A segment with no input stays empty but its ;; walls remain, so every variation has exactly five ;; separators. One continuous block, zero line breaks, no labels.
+A costume is an outfit written so it can be pasted next to any character block. It describes what is worn, never who wears it. In this mode the EXPAND rule applies to garments, materials, construction, wear, and how the pieces sit on a body.
+
+OUTPUT SHAPE, six segments separated by ;; in this order, one continuous block, zero line breaks:
+1. subject: the wearer's role or theme in one short clause (a mage, a deep sea diver of the 1890s). Never body, face, hair, skin, age, or build. Those belong to the character block this costume will be paired with.
+2. action: usually empty. Filled only when the outfit itself implies motion (a cloak trailing, chains swinging). The ;; walls stay.
+3. scene: usually empty. The ;; walls stay.
+4. props: the outfit. The defining garment comes first, then the rest in order of visual weight, then shoes, then accessories worn on the body. Each garment is one clause naming fabric, color, fit or silhouette, and condition, in that order, the way an image model reads best: "an oversized charcoal wool coat with frayed cuffs". Accessories are worn, never listed: "a red leather belt cinched over it". Sixty to one hundred twenty words.
+5. color palette: six to nine named colors taken from the materials chosen in this variation, each named once, ending with one accent called out as "one touch of". When the input names colors, those lock and lead the list.
+6. mood: a comma list of four to six adjectives ending with what the outfit reads as (a working uniform, a ceremonial vestment, a scavenged kit).
+
+RULES FOR GARMENTS:
+- The garments given in the input are fixed. Every variation carries every one of them. Their names never change.
+- What the input leaves open is yours to decide and must differ across the three variations: fabric and weave, weight, color, closures and trim, layering order, condition.
+- Fabric is named as a material a hand could feel: waxed linen, boiled wool, raw silk, oiled leather, brushed cotton, hammered brass. Never a brand, a designer, a franchise, or a fictional material name.
+- Fit is stated as silhouette: oversized, tailored, flowing, cropped, high-waisted, 7/8 length.
+- Condition is stated as visible wear: pristine, sun-faded, patched at the elbows, salt-stained hem, mirror-polished.
 
 VARIATIONS
-Three variations. All three use all of the input. Variation 1 shifts material condition (pristine versus worn). Variation 2 shifts silhouette. Variation 3 shifts palette. When the input carries separate labeled blocks per variation, each variation uses only its own block.
+Three variations. All three use all of the input and carry every given garment.
+Variation 1 decides fabric and weight: name the fiber and weave of every garment, chosen for the theme.
+Variation 2 decides construction and trim: closures, seams, hems, edges, hardware, and the layering order of the pieces.
+Variation 3 decides wear state and fit: choose one of pristine and tailored, worn and loosened, or ornate and ceremonial, and carry it through every garment.
+Each variation must name a different material for the same garment, so the three outfits read as three wardrobes for one role.
+
+Before returning, reread each variation: the subject segment has no body language, every given garment is present, and the three props segments differ in material, trim, and wear.
 
 RETURN ONLY THIS JSON, no markdown:
 {"variations": ["subject;;action;;scene;;props;;color palette;;mood", "...", "..."]}
