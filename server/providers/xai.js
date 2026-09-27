@@ -15,6 +15,8 @@
 //   Chat Completions is listed as legacy.
 
 // Trimmed: a stray space or newline pasted into a dashboard value would otherwise reach the API.
+import { looksDeclined } from "../parse.js";
+
 const key = (process.env.XAI_API_KEY || "").trim();
 const model = (process.env.XAI_MODEL || "").trim();
 const base = (process.env.XAI_BASE_URL || "https://api.x.ai/v1").replace(/\/+$/, "");
@@ -64,6 +66,11 @@ async function post(body) {
   try { data = await res.json(); } catch { throw new Error("xAI returned non-JSON (" + res.status + ")"); }
   if (!res.ok || data.error) {
     const msg = data.error && (data.error.message || (typeof data.error === "string" ? data.error : null));
+    // Refusal wording delivered in the error slot is a decline, not a fault.
+    if (looksDeclined(msg)) {
+      console.warn("[xai] declined:", String(msg).slice(0, 80));
+      throw new Error("MODEL_DECLINED");
+    }
     throw new Error(msg || "xAI error " + res.status);
   }
   return data;
