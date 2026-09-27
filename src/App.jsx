@@ -368,7 +368,7 @@ function SmartFill({mode,d,setD,aiLoad,onAiPull}){
       if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
       applyResult(result);
       if(!isCard)chain(result);
-    }catch(e){setErr("Parse failed -- check your input or try again.");}
+    }catch(e){setErr(e.message==="MODEL_DECLINED"?"The model declined this input.":"Parse failed -- "+(e.message||"try again."));}
     setLoading(false);
   };
   return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
@@ -568,7 +568,7 @@ export default function App(){
     setAiLoad(true);setAiErr("");
     try{
       setAiChips(await pullChips(mode,ctx));
-    }catch(e){setAiErr("AI pull failed.");}
+    }catch(e){setAiErr(e.message==="MODEL_DECLINED"?"The model declined this input.":"AI pull failed -- "+(e.message||"try again."));}
     setAiLoad(false);
   };
 
