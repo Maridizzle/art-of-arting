@@ -14,8 +14,9 @@
 //   The docs advise against server-side storage when sending images, so store is false.
 //   Chat Completions is listed as legacy.
 
-const key = process.env.XAI_API_KEY;
-const model = process.env.XAI_MODEL;
+// Trimmed: a stray space or newline pasted into a dashboard value would otherwise reach the API.
+const key = (process.env.XAI_API_KEY || "").trim();
+const model = (process.env.XAI_MODEL || "").trim();
 const base = (process.env.XAI_BASE_URL || "https://api.x.ai/v1").replace(/\/+$/, "");
 // Reasoning tokens are billed inside the output cap (usage reports reasoning_tokens under
 // output_tokens_details), so keep the floor generous.

@@ -15,8 +15,9 @@
 // Pages: /api/docs/guides/text, /api/docs/guides/images-vision,
 //        /api/docs/guides/reasoning, /api/reference/resources/responses/methods/create
 
-const key = process.env.OPENAI_API_KEY;
-const model = process.env.OPENAI_MODEL;
+// Trimmed: a stray space or newline pasted into a dashboard value would otherwise reach the API.
+const key = (process.env.OPENAI_API_KEY || "").trim();
+const model = (process.env.OPENAI_MODEL || "").trim();
 const base = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
 // Floor for max_output_tokens. Reasoning tokens are billed inside this cap, so a
 // small value can return status "incomplete" before any visible text.

@@ -341,7 +341,7 @@ const Lbl=({children})=><div className="lbl">{children}</div>;
 // Modes whose page fills from AI suggestions: after routing, Parse also pulls them so one tap fills the page.
 const CHIP_MODES=new Set(["costume","character","overlay"]);
 function SmartFill({mode,d,setD,aiLoad,onAiPull}){
-  const[v,setV]=useState("");const[loading,setLoading]=useState(false);const[err,setErr]=useState("");const[src,setSrc]=useState("");
+  const[v,setV]=useState("");const[loading,setLoading]=useState(false);const[err,setErr]=useState("");const[src,setSrc]=useState("");const[by,setBy]=useState("");
   const applyResult=(result)=>{
     setD(prev=>{
       const next={...prev};
@@ -355,7 +355,7 @@ function SmartFill({mode,d,setD,aiLoad,onAiPull}){
   };
   const doFill=async()=>{
     if(!v.trim())return;
-    setLoading(true);setErr("");setSrc("");
+    setLoading(true);setErr("");setSrc("");setBy("");
     const tagCount=(v.match(/\[[A-Z_][A-Z0-9_]*\]/g)||[]).length;
     const tagRatio=tagCount/Math.max(v.trim().split(/\s+/).length,1);
     const chain=(result)=>{if(!CHIP_MODES.has(mode)||!onAiPull)return;const ctx=(result.theme||result.concept||v).trim();if(ctx)onAiPull(ctx);};
@@ -366,12 +366,13 @@ function SmartFill({mode,d,setD,aiLoad,onAiPull}){
     try{
       const result=await routeText(mode,v,isCard);
       if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
+      setBy(result.provider||"");
       applyResult(result);
       if(!isCard)chain(result);
     }catch(e){setErr(e.message==="MODEL_DECLINED"?"The model declined this input.":"Parse failed -- "+(e.message||"try again."));}
     setLoading(false);
   };
-  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
+  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}{by?" · "+by:""}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
 }
 
 function ImageAnalyze({mode,setD}){
@@ -503,12 +504,12 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
 }
 
 // ---- Variation Card -- structured sentences ----
-function VariationCard({sections,idx,onCopySection,onCopyAll,cpState}){
+function VariationCard({sections,idx,onCopySection,onCopyAll,cpState,by}){
   return(
     <div className="vcard">
       <div className="vcard-head">
         <span>Variation {idx+1}</span>
-        <span style={{color:'var(--faint)',fontSize:'.54rem'}}>{sections.length} sections</span>
+        <span style={{color:'var(--faint)',fontSize:'.54rem'}}>{by?by+" · ":""}{sections.length} sections</span>
       </div>
       <div className="vsections">
         {sections.map((sec,si)=>(
@@ -533,6 +534,7 @@ export default function App(){
   const[d,setD]=useState({});
   const[aiChips,setAiChips]=useState({});
   const[vars,setVars]=useState([]);
+  const[answeredBy,setAnsweredBy]=useState("");
   const[loading,setLoading]=useState(false);
   const[aiLoad,setAiLoad]=useState(false);
   const[aiErr,setAiErr]=useState("");
@@ -578,6 +580,7 @@ export default function App(){
       const rd1=emitRaw?d:resolveData(d,toolbox),rd2=emitRaw?d:resolveData(d,toolbox),rd3=emitRaw?d:resolveData(d,toolbox);
       const result=await generate(mode,buildGenPromptVaried(rd1,rd2,rd3,mode));
       const parsed=(result.variations||[]).map(v=>parseSections(v,mode));
+      setAnsweredBy(result.provider||"");
       setVars(parsed);
     }catch(e){
       setGenErr(e.message==="MODEL_DECLINED"
@@ -655,6 +658,7 @@ export default function App(){
                 idx={i}
                 onCopyAll={doCopyAll}
                 cpState={cpState}
+                by={answeredBy}
               />
             ))}
           </div>

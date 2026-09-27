@@ -7,7 +7,7 @@ import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { timingSafeEqual } from "node:crypto";
-import { send, providerName } from "./provider.js";
+import { callModel, providerName } from "./provider.js";
 import { prompt } from "./prompts.js";
 import { parseModelJson, parseVisionJson } from "./parse.js";
 
@@ -105,8 +105,8 @@ app.post("/api/route", asyncRoute(async (req, res) => {
   // A pasted character sheet in Character mode is extracted, not developed.
   const isCard = Boolean(req.body.card) && mode === "character";
   const system = isCard ? prompt("extract_character") : prompt("route", { mode });
-  const raw = await send({ system, messages: [{ role: "user", content: text }], maxTokens: isCard ? 1200 : 800 });
-  res.json(parseModelJson(raw));
+  const { result, provider } = await callModel({ system, messages: [{ role: "user", content: text }], maxTokens: isCard ? 1200 : 800 }, parseModelJson);
+  res.set("X-Provider", provider).json(result);
 }));
 
 // Chip pools from a theme or concept.
@@ -127,8 +127,8 @@ app.post("/api/chips", asyncRoute(async (req, res) => {
   } else {
     throw new Error("chips are not available for mode: " + mode);
   }
-  const raw = await send({ system, messages: [{ role: "user", content: user }], maxTokens: 1000 });
-  res.json(parseModelJson(raw));
+  const { result, provider } = await callModel({ system, messages: [{ role: "user", content: user }], maxTokens: 1000 }, parseModelJson);
+  res.set("X-Provider", provider).json(result);
 }));
 
 // Vision: extract fields from an image.
@@ -137,7 +137,7 @@ app.post("/api/analyze", asyncRoute(async (req, res) => {
   const { imageBase64, mediaType, text } = req.body;
   if (!imageBase64 || !mediaType) throw new Error("imageBase64 and mediaType are required");
   const name = mode === "image" || mode === "character" || mode === "costume" ? "vision_" + mode : "vision_generic";
-  const raw = await send({
+  const { result, provider } = await callModel({
     system: prompt(name),
     messages: [{
       role: "user",
@@ -147,8 +147,8 @@ app.post("/api/analyze", asyncRoute(async (req, res) => {
       ],
     }],
     maxTokens: 1000,
-  });
-  res.json(parseVisionJson(raw));
+  }, parseVisionJson);
+  res.set("X-Provider", provider).json(result);
 }));
 
 // Generate three variations from the labeled inputs block built in the browser.
@@ -158,8 +158,8 @@ app.post("/api/generate", asyncRoute(async (req, res) => {
   if (!input.trim()) throw new Error("input is required");
   // Shared preamble (the five laws and syntax rules) followed by the mode's own output contract.
   const system = prompt("preamble") + "\n\n" + prompt("generate_" + mode);
-  const raw = await send({ system, messages: [{ role: "user", content: input }], maxTokens: 2400 });
-  res.json(parseModelJson(raw));
+  const { result, provider } = await callModel({ system, messages: [{ role: "user", content: input }], maxTokens: 2400 }, parseModelJson);
+  res.set("X-Provider", provider).json(result);
 }));
 
 // Production: serve the built client if dist/ exists.
