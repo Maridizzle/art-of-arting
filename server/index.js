@@ -100,7 +100,10 @@ app.post("/api/route", asyncRoute(async (req, res) => {
   const mode = requireMode(req.body.mode);
   const text = String(req.body.text || "");
   if (!text.trim()) throw new Error("text is required");
-  const raw = await send({ system: prompt("route", { mode }), messages: [{ role: "user", content: text }], maxTokens: 800 });
+  // A pasted character sheet in Character mode is extracted, not developed.
+  const isCard = Boolean(req.body.card) && mode === "character";
+  const system = isCard ? prompt("extract_character") : prompt("route", { mode });
+  const raw = await send({ system, messages: [{ role: "user", content: text }], maxTokens: isCard ? 1200 : 800 });
   res.json(parseModelJson(raw));
 }));
 

@@ -10,7 +10,7 @@ RULES:
 
 Fields by mode:
 image: {subject, action, scene, props, palette:[], medium, ideas}
-character: {concept, species:[], body:[], age:[], archetype:[], skin:[], eyes:[], hair:[], marks, expression:[], world:[]}
+character: {concept, species:[], body:[], age:[], archetype:[], skin:[], eyes:[], hair:[], marks, attire, setting, expression:[], world:[]}
 scene: {characters:[], environment, action_level, lighting:[]}
 overlay: {theme, vibe}
 costume: {theme, vibe}

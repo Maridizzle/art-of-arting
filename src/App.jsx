@@ -245,8 +245,8 @@ function buildPreview(d,mode){
   if(!mode)return"";const B=[];
   const sub=[d.medium,d.subject,d.concept,d.species?.join(", "),d.archetype?.join(", "),d.medium_arr?.join(", "),d.theme].filter(Boolean);if(sub.length)B.push(sub.join(", "));
   const act=[d.action,d.action_level].filter(Boolean);if(act.length)B.push(act.join(", "));
-  const scn=[d.scene,d.environment,d.characters?.filter(Boolean).join(" and ")].filter(Boolean);if(scn.length)B.push(scn.join(", "));
-  const prp=[d.props,d.top_sel?.join(", "),d.bottoms_sel?.join(", "),d.shoes_sel?.join(", "),d.accessories_sel?.join(", ")].filter(Boolean);if(prp.length)B.push(prp.join(", "));
+  const scn=[d.scene,d.environment,d.setting,d.characters?.filter(Boolean).join(" and ")].filter(Boolean);if(scn.length)B.push(scn.join(", "));
+  const prp=[d.props,d.attire,d.top_sel?.join(", "),d.bottoms_sel?.join(", "),d.shoes_sel?.join(", "),d.accessories_sel?.join(", ")].filter(Boolean);if(prp.length)B.push(prp.join(", "));
   const pal=[d.palette?.join(", "),d.lighting?.join(", ")].filter(Boolean);if(pal.length)B.push(pal.join(", "));
   const mood=[d.emotion?.map(e=>e.r).join("; "),d.vibe,d.ideas].filter(Boolean);if(mood.length)B.push(mood.join(", "));
   return B.join(" · ");
@@ -267,7 +267,7 @@ function buildGenPrompt(d,mode){
     aa("Closing Mood",d.ov_mood);
   }
   else if(mode==="costume"){a("Theme",d.theme);aa("Top",d.top_sel);aa("Bottoms",d.bottoms_sel);aa("Shoes",d.shoes_sel);aa("Accessories",d.accessories_sel);a("Vibe",d.vibe);}
-  else if(mode==="character"){a("Concept",d.concept);aa("Species",d.species);aa("Body",d.body);aa("Age",d.age);aa("Archetype",d.archetype);aa("Skin",d.skin);aa("Eyes",d.eyes);aa("Hair",d.hair);a("Marks",d.marks);aa("Expression",d.expression);aa("World",d.world);}
+  else if(mode==="character"){a("Concept",d.concept);aa("Species",d.species);aa("Body",d.body);aa("Age",d.age);aa("Archetype",d.archetype);aa("Skin",d.skin);aa("Eyes",d.eyes);aa("Hair",d.hair);a("Marks",d.marks);a("Attire",d.attire);a("Setting",d.setting);aa("Expression",d.expression);aa("World",d.world);}
   else if(mode==="scene"){if(d.characters?.filter(Boolean).length)a("Characters",d.characters.filter(Boolean).join(". "));a("Environment",d.environment);a("Action level",d.action_level);aa("Lighting",d.lighting);}
   return L.join("\n");
 }
@@ -358,17 +358,19 @@ function SmartFill({mode,d,setD,aiLoad,onAiPull}){
     const tagCount=(v.match(/\[[A-Z_][A-Z0-9_]*\]/g)||[]).length;
     const tagRatio=tagCount/Math.max(v.trim().split(/\s+/).length,1);
     const chain=(result)=>{if(!CHIP_MODES.has(mode)||!onAiPull)return;const ctx=(result.theme||result.concept||v).trim();if(ctx)onAiPull(ctx);};
+    // A character sheet: a "Name [sex/age]" line, several Key: lines, or simply a long paste.
+    const isCard=mode==='character'&&(/^[^\n]{1,80}\[[^\]]*\/[^\]]*\]\s*$/m.test(v)||(v.match(/^\s*[A-Za-z][A-Za-z /()&-]{1,40}:/gm)||[]).length>=4||v.length>800);
     if(tagRatio>=0.5){setSrc("local");const r=localRoute(v,mode);applyResult(r);setLoading(false);chain(r);return;}
-    setSrc("ai");
+    setSrc(isCard?"card":"ai");
     try{
-      const result=await routeText(mode,v);
+      const result=await routeText(mode,v,isCard);
       if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
       applyResult(result);
-      chain(result);
+      if(!isCard)chain(result);
     }catch(e){setErr("Parse failed -- check your input or try again.");}
     setLoading(false);
   };
-  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":"✦ AI parsed"}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
+  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
 }
 
 function ImageAnalyze({mode,setD}){
@@ -494,7 +496,7 @@ function ModeFields({mode,d,up,toggleArr,toggleEmo,aiChips,onAiPull,aiLoad,aiErr
     </>);
   }
   if(mode==="costume")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept"><input className="fi" value={d.theme||""} onChange={e=>up("theme",e.target.value)} placeholder="Victorian deep sea diver"/><AiBtn label="Generate costume ideas"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Ideas loaded</div>}</Sec>{["top","bottoms","shoes","accessories"].map(cat=>(<Sec key={cat} title={cat.charAt(0).toUpperCase()+cat.slice(1)}>{ac(cat).length>0&&<p className="ainote">AI suggestions:</p>}<ChipGroup opts={ac(cat)} sel={d[cat+"_sel"]||[]} onToggle={x=>ta(cat+"_sel",x)} onAdd={x=>up(cat+"_sel",[...(d[cat+"_sel"]||[]),x])}/></Sec>))}<Sec title="Mood / Vibe"><textarea className="fi" rows={2} value={d.vibe||""} onChange={e=>up("vibe",e.target.value)} placeholder="weathered, practical…"/></Sec></>);
-  if(mode==="character")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept -- [ADVES] [ADELYRIA] [ACHARS]"><input className="fi" value={d.concept||""} onChange={e=>up("concept",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><AiBtn label="Populate from concept"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Options loaded</div>}</Sec><Sec title="Foundation"><div className="slbl">Species</div>{cg([...SPECIES_D,...ac("species")],"species")}<div className="slbl">Body</div>{cg([...BODY_D,...ac("body")],"body")}<div className="slbl">Age feel</div>{cg([...AGE_D,...ac("age")],"age")}</Sec><Sec title="Appearance"><div className="slbl">Skin</div>{cg([...SKIN_D,...ac("skin")],"skin")}<div className="slbl">Eyes</div>{cg([...EYES_D,...ac("eyes")],"eyes")}<div className="slbl">Hair</div>{cg([...HAIR_D,...ac("hair")],"hair")}</Sec><Sec title="Identity"><div className="slbl">Archetype</div>{cg([...ARCH_D,...ac("archetype")],"archetype")}<div className="slbl">World</div>{cg([...WORLD_D,...ac("world")],"world")}</Sec><Sec title="Details"><Lbl>Defining marks</Lbl><input className="fi" value={d.marks||""} onChange={e=>up("marks",e.target.value)} placeholder="deep scar, bioluminescent tattoos…"/><div className="slbl">Expression</div>{cg([...EXPR_D,...ac("expression")],"expression")}</Sec></>);
+  if(mode==="character")return(<><ImageAnalyze mode={mode} setD={setD}/><Sec title="Concept -- [ADVES] [ADELYRIA] [ACHARS]"><input className="fi" value={d.concept||""} onChange={e=>up("concept",e.target.value)} placeholder="[ADVES], [ACHARS], or describe…"/><AiBtn label="Populate from concept"/>{aiErr&&<div className="err">{aiErr}</div>}{Object.keys(aiChips).length>0&&<div className="aiok">✓ Options loaded</div>}</Sec><Sec title="Foundation"><div className="slbl">Species</div>{cg([...SPECIES_D,...ac("species")],"species")}<div className="slbl">Body</div>{cg([...BODY_D,...ac("body")],"body")}<div className="slbl">Age feel</div>{cg([...AGE_D,...ac("age")],"age")}</Sec><Sec title="Appearance"><div className="slbl">Skin</div>{cg([...SKIN_D,...ac("skin")],"skin")}<div className="slbl">Eyes</div>{cg([...EYES_D,...ac("eyes")],"eyes")}<div className="slbl">Hair</div>{cg([...HAIR_D,...ac("hair")],"hair")}</Sec><Sec title="Identity"><div className="slbl">Archetype</div>{cg([...ARCH_D,...ac("archetype")],"archetype")}<div className="slbl">World</div>{cg([...WORLD_D,...ac("world")],"world")}</Sec><Sec title="Details"><Lbl>Defining marks</Lbl><input className="fi" value={d.marks||""} onChange={e=>up("marks",e.target.value)} placeholder="deep scar, bioluminescent tattoos…"/><Lbl>Attire</Lbl><input className="fi" value={d.attire||""} onChange={e=>up("attire",e.target.value)} placeholder="torn paint-spattered hospital shift, bare feet…"/><Lbl>Setting</Lbl><input className="fi" value={d.setting||""} onChange={e=>up("setting",e.target.value)} placeholder="a locked ward of old stone, an art-therapy room turned gallery…"/><div className="slbl">Expression</div>{cg([...EXPR_D,...ac("expression")],"expression")}</Sec></>);
   if(mode==="scene")return(<><Sec title="Characters -- [ACHARS] [DGDRESSED]">{(d.characters||[""]).map((v,i)=>(<div className="ce" key={i}><input className="fi" value={v} placeholder={"Character "+(i+1)+" -- or [ADVES]"} onChange={e=>{const n=[...(d.characters||[""])];n[i]=e.target.value;up("characters",n);}}/>{(d.characters||[""]).length>1&&<button className="xbtn" onClick={()=>up("characters",(d.characters||[]).filter((_,j)=>j!==i))}>✕</button>}</div>))}{(d.characters||[""]).length<6&&<button className="addc" onClick={()=>up("characters",[...(d.characters||[""]),""]) }>+ add character</button>}</Sec><Sec title="Setting"><Lbl>Environment -- [SCENERY]</Lbl><textarea className="fi" rows={2} value={d.environment||""} onChange={e=>up("environment",e.target.value)} placeholder="[SCEN_RUINS], [SCEN_URBAN]…"/><Lbl>Action Level</Lbl><textarea className="fi" rows={2} value={d.action_level||""} onChange={e=>up("action_level",e.target.value)} placeholder="tense standoff -- or [ACTION]"/></Sec><Sec title="Lighting -- [RIMBA] [WEATHER]">{cg(LIGHTING,"lighting")}</Sec></>);
   return null;
 }
