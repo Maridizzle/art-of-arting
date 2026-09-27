@@ -82,6 +82,8 @@ app.use((req, res, next) => {
 const asyncRoute = fn => (req, res) => {
   fn(req, res).catch(err => {
     const msg = err && err.message ? err.message : "Unknown error";
+    // The error text only, never the request body, so the deploy log shows why a call failed.
+    if (msg !== "MODEL_DECLINED") console.error(`${req.method} ${req.path} failed: ${msg.slice(0, 300)}`);
     res.status(msg === "MODEL_DECLINED" ? 422 : 500).json({ error: msg });
   });
 };
