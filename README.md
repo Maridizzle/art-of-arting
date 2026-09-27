@@ -10,8 +10,8 @@ Flux and Perchance image prompt builder. Five modes: Standalone Image, Overlay, 
 | `server/` | Provider dispatch, per-mode system prompts, key storage, request logging | Prompt content beyond passing it through |
 
 - `server/prompts/*.txt` are the system prompts, one file per job. Edit them without touching code, then restart the server.
-- `server/providers/openai.js` is the OpenAI adapter. Every provider exposes the same `send({ system, messages, maxTokens })`.
-- `server/provider.js` picks the adapter from `PROVIDER` in `.env`.
+- `server/providers/openai.js` (OpenAI Responses API) and `server/providers/xai.js` (xAI Grok, Responses API) are the adapters. Every provider exposes the same `send({ system, messages, maxTokens })`.
+- `server/provider.js` picks the adapter from `PROVIDER` in `.env`: `openai` or `xai`.
 
 Server routes: `POST /api/route` (Smart Fill), `POST /api/chips` (chip pools), `POST /api/analyze` (vision), `POST /api/generate` (three variations), `GET /api/health`.
 

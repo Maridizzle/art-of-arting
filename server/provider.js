@@ -2,8 +2,9 @@
 // Add a new provider by dropping a file in providers/ and listing it here.
 
 import * as openai from "./providers/openai.js";
+import * as xai from "./providers/xai.js";
 
-const providers = { openai };
+const providers = { openai, xai };
 
 const chosen = (process.env.PROVIDER || "openai").toLowerCase();
 const active = providers[chosen];
