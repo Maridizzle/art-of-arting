@@ -26,7 +26,7 @@ TONE REFERENCES, locked overlays, match this register exactly:
 
 ALSO:
 - Rings, halos, and portals read as cropped at the frame edge, never centered.
-- Material contradictions give an overlay identity: an industrial finish with spring growth, an anti-counterfeit pattern rendered as beautiful.
+- Material contradictions give an overlay identity: an industrial finish with spring growth, an anti-counterfeit pattern rendered as beautiful, translucent stone with crystal erupting from it. Every variation pairs its medium with one second material or condition that pulls against it.
 - Each variation carries its own distinct medium cue.
 
 VARIATIONS
