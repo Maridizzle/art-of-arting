@@ -5,7 +5,14 @@
 // special message "MODEL_DECLINED" is passed through unchanged so the UI can
 // show its softer wording for a refusal.
 
+// Bypass toggle: when set, every call goes to this provider alone (no chain, no
+// fallback). A call that names its own provider, such as a Redo, keeps its own.
+let forcedProvider = "";
+export const setForcedProvider = name => { forcedProvider = String(name || ""); };
+export const getForcedProvider = () => forcedProvider;
+
 async function post(path, body) {
+  if (forcedProvider && body.provider === undefined) body = { ...body, provider: forcedProvider };
   const res = await fetch("/api" + path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -24,13 +31,15 @@ async function post(path, body) {
   // lands in the form state when a result is spread into the fields.
   if (data && typeof data === "object") {
     Object.defineProperty(data, "provider", { value: res.headers.get("X-Provider") || "", enumerable: false });
+    // The provider after the one that answered, for a manual redo. Empty when none.
+    Object.defineProperty(data, "providerNext", { value: res.headers.get("X-Provider-Next") || "", enumerable: false });
   }
   return data;
 }
 
 // Smart Fill: route free text into the mode's fields.
 // card=true marks a pasted character sheet (Character mode): extracted, not developed.
-export const routeText = (mode, text, card = false) => post("/route", { mode, text, card });
+export const routeText = (mode, text, card = false, provider) => post("/route", { mode, text, card, provider });
 
 // Chip pools for overlay / costume / character from a theme or concept.
 export const pullChips = (mode, context) => post("/chips", { mode, context });
@@ -40,4 +49,4 @@ export const analyzeImage = (mode, imageBase64, mediaType, text) =>
   post("/analyze", { mode, imageBase64, mediaType, text });
 
 // Generate three variations. `input` is the labeled inputs block built in the browser.
-export const generate = (mode, input) => post("/generate", { mode, input });
+export const generate = (mode, input, provider) => post("/generate", { mode, input, provider });

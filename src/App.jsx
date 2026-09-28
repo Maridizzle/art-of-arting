@@ -1,5 +1,10 @@
-import { useState, useMemo, useRef } from "react";
-import { routeText, pullChips, analyzeImage, generate } from "./api.js";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { routeText, pullChips, analyzeImage, generate, setForcedProvider } from "./api.js";
+
+// Bypass toggle: send every call straight to this provider, skipping OpenAI. Remembered per browser.
+const BYPASS_PROVIDER="xai";
+const BYPASS_KEY="aoa.bypass";
+const readBypass=()=>{try{return localStorage.getItem(BYPASS_KEY)==="1";}catch{return false;}};
 
 function parseToolbox(text) {
   const map={};const lines=text.split('\n');let cur=null,acc=[];
@@ -341,7 +346,7 @@ const Lbl=({children})=><div className="lbl">{children}</div>;
 // Modes whose page fills from AI suggestions: after routing, Parse also pulls them so one tap fills the page.
 const CHIP_MODES=new Set(["costume","character","overlay"]);
 function SmartFill({mode,d,setD,aiLoad,onAiPull}){
-  const[v,setV]=useState("");const[loading,setLoading]=useState(false);const[err,setErr]=useState("");const[src,setSrc]=useState("");const[by,setBy]=useState("");
+  const[v,setV]=useState("");const[loading,setLoading]=useState(false);const[err,setErr]=useState("");const[src,setSrc]=useState("");const[by,setBy]=useState("");const[next,setNext]=useState("");const lastText=useRef("");
   const applyResult=(result)=>{
     setD(prev=>{
       const next={...prev};
@@ -353,26 +358,30 @@ function SmartFill({mode,d,setD,aiLoad,onAiPull}){
     });
     setV("");
   };
-  const doFill=async()=>{
-    if(!v.trim())return;
-    setLoading(true);setErr("");setSrc("");setBy("");
-    const tagCount=(v.match(/\[[A-Z_][A-Z0-9_]*\]/g)||[]).length;
-    const tagRatio=tagCount/Math.max(v.trim().split(/\s+/).length,1);
-    const chain=(result)=>{if(!CHIP_MODES.has(mode)||!onAiPull)return;const ctx=(result.theme||result.concept||v).trim();if(ctx)onAiPull(ctx);};
+  // forced: a provider name from the Redo button. The button passes a string; the Parse button passes a click event.
+  const doFill=async(forced)=>{
+    const useForced=typeof forced==="string"&&!!forced;
+    const text=useForced&&lastText.current?lastText.current:v;
+    if(!text.trim())return;
+    lastText.current=text;
+    setLoading(true);setErr("");setSrc("");setBy("");setNext("");
+    const tagCount=(text.match(/\[[A-Z_][A-Z0-9_]*\]/g)||[]).length;
+    const tagRatio=tagCount/Math.max(text.trim().split(/\s+/).length,1);
+    const chain=(result)=>{if(!CHIP_MODES.has(mode)||!onAiPull)return;const ctx=(result.theme||result.concept||text).trim();if(ctx)onAiPull(ctx);};
     // A character sheet: a "Name [sex/age]" line, several Key: lines, or simply a long paste.
-    const isCard=mode==='character'&&(/^[^\n]{1,80}\[[^\]]*\/[^\]]*\]\s*$/m.test(v)||(v.match(/^\s*[A-Za-z][A-Za-z /()&-]{1,40}:/gm)||[]).length>=4||v.length>800);
-    if(tagRatio>=0.5){setSrc("local");const r=localRoute(v,mode);applyResult(r);setLoading(false);chain(r);return;}
+    const isCard=mode==='character'&&(/^[^\n]{1,80}\[[^\]]*\/[^\]]*\]\s*$/m.test(text)||(text.match(/^\s*[A-Za-z][A-Za-z /()&-]{1,40}:/gm)||[]).length>=4||text.length>800);
+    if(tagRatio>=0.5&&!useForced){setSrc("local");const r=localRoute(text,mode);applyResult(r);setLoading(false);chain(r);return;}
     setSrc(isCard?"card":"ai");
     try{
-      const result=await routeText(mode,v,isCard);
+      const result=await routeText(mode,text,isCard,useForced?forced:undefined);
       if(!result||typeof result!=="object"||Array.isArray(result)){setErr("Got unexpected response -- try rephrasing.");setLoading(false);return;}
-      setBy(result.provider||"");
+      setBy(result.provider||"");setNext(result.providerNext||"");
       applyResult(result);
       if(!isCard)chain(result);
     }catch(e){setErr(e.message==="MODEL_DECLINED"?"The model declined this input.":"Parse failed -- "+(e.message||"try again."));}
     setLoading(false);
   };
-  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}{by?" · "+by:""}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
+  return(<div className="smart-sec"><div className="sectl">✦ Smart Fill {src&&<span style={{fontSize:".55rem",color:src==="local"?'var(--good)':'var(--cya)',marginLeft:4}}>{src==="local"?"⚡ local route":src==="card"?"✦ card extracted":"✦ AI parsed"}{by?" · "+by:""}</span>}</div><textarea className="fi" rows={3} value={v} onChange={e=>setV(e.target.value)} placeholder={mode==='character'?'Describe your character, or paste a whole character sheet…':`Describe your ${mode}… [TAG] calls route instantly`}/><button className="smartbtn" disabled={loading||!v.trim()||aiLoad} onClick={doFill}>{loading?<><div className="pulse pur"/>Parsing…</>:"✦ Parse & fill fields"}</button>{next&&!loading&&<button className="addc" style={{marginTop:5}} onClick={()=>doFill(next)}>↻ Redo on {next}</button>}{err&&<div className="err" style={{marginTop:5}}>{err}</div>}</div>);
 }
 
 function ImageAnalyze({mode,setD}){
@@ -535,6 +544,7 @@ export default function App(){
   const[aiChips,setAiChips]=useState({});
   const[vars,setVars]=useState([]);
   const[answeredBy,setAnsweredBy]=useState("");
+  const[nextProvider,setNextProvider]=useState("");
   const[loading,setLoading]=useState(false);
   const[aiLoad,setAiLoad]=useState(false);
   const[aiErr,setAiErr]=useState("");
@@ -545,6 +555,8 @@ export default function App(){
   const[chunks,setChunks]=useState(()=>Array(TOTAL_PAGES).fill(""));
   const[showLoader,setShowLoader]=useState(false);
   const[emitRaw,setEmitRaw]=useState(false); // true: send {braces} and [TAGS] untouched, for pasting into a Perchance generator
+  const[bypass,setBypass]=useState(readBypass); // true: every call goes straight to BYPASS_PROVIDER, OpenAI never contacted
+  useEffect(()=>{setForcedProvider(bypass?BYPASS_PROVIDER:"");try{localStorage.setItem(BYPASS_KEY,bypass?"1":"0");}catch{}},[bypass]);
   const taRef=useRef(null);
 
   const loadMap=json=>{const map=parseToolbox(Object.values(json).join('\n'));setToolbox(map);setTbCount(Object.keys(map).length);};
@@ -574,13 +586,15 @@ export default function App(){
     setAiLoad(false);
   };
 
-  const doGenerate=async()=>{
-    setLoading(true);setGenErr("");setVars([]);
+  // forced: a provider name from the Redo button; the Generate button passes a click event.
+  const doGenerate=async(forced)=>{
+    const useForced=typeof forced==="string"&&!!forced;
+    setLoading(true);setGenErr("");setVars([]);setNextProvider("");
     try{
       const rd1=emitRaw?d:resolveData(d,toolbox),rd2=emitRaw?d:resolveData(d,toolbox),rd3=emitRaw?d:resolveData(d,toolbox);
-      const result=await generate(mode,buildGenPromptVaried(rd1,rd2,rd3,mode));
+      const result=await generate(mode,buildGenPromptVaried(rd1,rd2,rd3,mode),useForced?forced:undefined);
       const parsed=(result.variations||[]).map(v=>parseSections(v,mode));
-      setAnsweredBy(result.provider||"");
+      setAnsweredBy(result.provider||"");setNextProvider(result.providerNext||"");
       setVars(parsed);
     }catch(e){
       setGenErr(e.message==="MODEL_DECLINED"
@@ -622,6 +636,7 @@ export default function App(){
             {tbCount>0&&<button className="uploadbtn" onClick={clearAll} style={{borderColor:"var(--bad)",color:"var(--bad)"}}>✕ Clear</button>}
           </div>
           <Tog on={!emitRaw} onClick={()=>setEmitRaw(r=>!r)} label={emitRaw?"Emitting raw {braces} and [TAGS] for pasting into a Perchance generator":"Resolving {braces} and [TAGS] locally for testing"}/>
+          <Tog on={bypass} onClick={()=>setBypass(b=>!b)} label={bypass?`Bypassing OpenAI: every call goes straight to ${BYPASS_PROVIDER}`:`OpenAI first, ${BYPASS_PROVIDER} on decline (tap to bypass OpenAI)`}/>
           {showLoader&&(
             <div className="chunkloader">
               <div className="chunktitle">Paste each page from your notepad_export JSON</div>
@@ -651,6 +666,7 @@ export default function App(){
             {warnings.length>0&&<div className="lints">{warnings.map((w,i)=><div key={i} className="lint"><b>{w.law}</b>{w.msg}{w.from?.length>0&&<span> · from {w.from.join(', ')}</span>}</div>)}</div>}
             <button className="genbtn" onClick={doGenerate} disabled={loading}>{loading?"Generating…":"✦ Generate 3 variations"}</button>
             {genErr&&<div className="err">{genErr}</div>}
+            {nextProvider&&vars.length>0&&!loading&&<button className="addc" style={{marginBottom:9}} onClick={()=>doGenerate(nextProvider)}>↻ Redo all three on {nextProvider}</button>}
             {vars.map((sections,i)=>(
               <VariationCard
                 key={i}

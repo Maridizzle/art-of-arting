@@ -17,19 +17,30 @@ for (const name of chain) {
 
 export const providerName = chain.join(",");
 
-// callModel(args, parse): send to each provider in order, parse the reply, and return
-// { result, provider }. A decline, whether a refusal part from the adapter or a
-// refusal-shaped reply caught by the parser, moves to the next provider.
-export async function callModel(args, parse) {
-  for (let i = 0; i < chain.length; i++) {
-    const name = chain[i];
+// callModel(args, parse, forced): send to each provider in order, parse the reply, and
+// return { result, provider, next }. A decline, whether a refusal part from the adapter
+// or a refusal-shaped reply caught by the parser, moves to the next provider. `next` names
+// the provider after the one that answered, so the client can offer a manual redo when a
+// provider complied with a tamer version instead of declining. With `forced` set to a
+// provider name, only that provider is used and there is no fallback.
+export async function callModel(args, parse, forced) {
+  let order = chain;
+  if (forced) {
+    const name = String(forced).toLowerCase().trim();
+    if (!providers[name]) throw new Error(`Unknown provider: ${name}`);
+    order = [name];
+  }
+  for (let i = 0; i < order.length; i++) {
+    const name = order[i];
     try {
       const raw = await providers[name].send(args);
-      return { result: parse(raw), provider: name };
+      const pos = chain.indexOf(name);
+      const next = pos >= 0 && pos < chain.length - 1 ? chain[pos + 1] : "";
+      return { result: parse(raw), provider: name, next };
     } catch (err) {
       const declined = err && err.message === "MODEL_DECLINED";
-      if (declined && i < chain.length - 1) {
-        console.warn(`[provider] ${name} declined; falling back to ${chain[i + 1]}`);
+      if (declined && i < order.length - 1) {
+        console.warn(`[provider] ${name} declined; falling back to ${order[i + 1]}`);
         continue;
       }
       throw err;
