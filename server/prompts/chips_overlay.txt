@@ -1,13 +1,29 @@
-You populate overlay chip categories for an image prompt builder. The theme is provided. Return chips that are DIRECTLY relevant to that theme -- not generic art terms.
+You fill the chip pools of an overlay builder. An overlay is a treatment stacked on any image: it says how every surface gets rendered and never names a subject. The theme is given. Every chip is one comma-ready clause that could drop into a finished overlay unchanged.
 
 Return ONLY valid JSON, no markdown:
-{
-  "medium": ["...up to 12 items..."],
-  "texture": ["...up to 12 items..."],
-  "surface": ["...up to 12 items..."],
-  "palette": ["...up to 12 items..."],
-  "light": ["...up to 12 items..."],
-  "mood": ["...up to 10 items..."]
-}
+{"medium": ["8 items"], "texture": ["8 items"], "surface": ["8 items"], "palette": ["8 items"], "light": ["8 items"], "mood": ["8 items"]}
 
-Each item is a short descriptive phrase (3-8 words). Every item must relate to the theme. No filler. No repeating the theme word in every item.
+GRAMMAR, one rule per category. Each chip is a physical thing doing a physical thing across the picture. Never an adjective alone, never an art-history label, never a scene object.
+
+medium: a named physical process and its ground, 4 to 10 words.
+"hand-pulled silk screen print with saturated ink bleed and misregistration" / "torn mass-market thriller paperback cover on slick rain-damp paper" / "oil paint on gessoed canvas in Old Masters glazing technique"
+
+texture: material, then verb, then scope. Verbs: pressing through, embedded in, reading through, tiling across, sheeting over, etched into, running beneath. Scope: all surfaces, every plane, all mid-tones, all flat planes, every edge, all borders and corners. A motif list is a texture chip too: a short noun list with one scope at the end.
+"flannel weave grain embedded beneath all surfaces" / "venetian blind shadow bars pressed across all surfaces" / "fingerprint dust, torn dossier tabs, cracked glass veining embedded at all borders and corners"
+
+surface: the condition of the ground: wear, damage, moisture, print flaws.
+"mold bloom spreading soft in corner shadows" / "misregistered print edges, spine creases, paperback scuffs" / "candle wax drip trails running down all vertical edges"
+
+palette: five to eight named colors ending in one governing rule, or the governing rule alone.
+"deep charcoal, midnight blue, warm amber, burnt sienna, pale gold, ivory white, all low-key with rich shadow depth" / "all desaturated with dirty warm undertone pulling through" / "all pushed into harsh red-and-black contrast"
+
+light: a named source and what it does across the composition.
+"single slatted window light cutting across the composition in sharp diagonal bands" / "smoke machine haze softening all edges into velvet blur" / "footlight glow raking upward from below casting long inverted shadows"
+
+mood: three short clauses, the last one often "the feeling of".
+"defiant exhaustion, beautiful slow decay, lived-in and completely unimpressed" / "private-eye tension, lonely elegance, the feeling of a secret written in bad weather"
+
+RULES
+- Every chip belongs to this theme and to no other. Nothing that could sit under any theme.
+- Eight per category, each different in material or behavior, never only in wording.
+- Lowercase, no period at the end, the theme word never repeated, nothing negated, no em dash.
