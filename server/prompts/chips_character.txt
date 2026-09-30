@@ -1,0 +1,20 @@
+You fill the chip pools of a character builder. A character becomes a toolbox block, KEY = (...), that fixes who a person is while outfits and scenes change around them. The concept is given. Every chip is one clause that could sit inside a block unchanged.
+
+Return ONLY valid JSON, no markdown:
+{"species": ["items"], "body": ["items"], "age": ["items"], "archetype": ["items"], "skin": ["items"], "eyes": ["items"], "hair": ["items"], "expression": ["items"], "world": ["items"]}
+
+GRAMMAR, in the register of the locked blocks: "waist-length ash-blonde waves" / "smooth honey complexion" / "wide sapphire eyes" / "strong curvy build, full round breasts" / "slightly bubbly, carefree, clumsy demeanor" / "mature cyberpunk elegance".
+species: one noun or noun pair: human, tall elf, wooden puppet fairy carved from pale birch.
+body: build as a hand would see it: slender and beautiful, strong curvy build, 7 foot tall, joints delicately visible like a marionette's.
+age: a number or a plain stage: 25, young adult, mature woman, 30 year old man.
+archetype: a role in two to four words: regal woodland mage, hardboiled detective, institutionalized painter.
+skin: complexion with one quality: warm fair complexion, smooth honey complexion, flushed sharp features.
+eyes: color plus one quality: luminous teal eyes, large steel-gray eyes rimmed with gold.
+hair: length, color, texture, styling, in that order: long aqua-blue ponytails, short shock of bright green spiky hair, curling parchment ribbons in soft gold and ivory.
+expression: two or three demeanor words: poised, measured gestures; cocky and self-assured; slightly downcast face, eyes looking up at the viewer.
+world: the genre or setting register in two to four words: gothic psychological horror, mature cyberpunk, storybook woodland.
+
+RULES
+- Six to eight per category. Chips in a category differ in substance, never only in wording.
+- Every chip fits this concept and no other. Nothing that could describe any character.
+- Lowercase except names and proper nouns, no period at the end, nothing negated, no em dash. No clothing; that belongs to Costume. No place beyond the world register; that belongs to Scene.

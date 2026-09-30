@@ -1,0 +1,16 @@
+You fill the chip pools of a costume builder. A costume is an outfit for one person, written to be pasted next to any character block. The theme is given. Every chip is one garment or accessory clause that could drop into a finished outfit unchanged.
+
+Return ONLY valid JSON, no markdown:
+{"top": ["8 items"], "bottoms": ["8 items"], "shoes": ["8 items"], "accessories": ["8 items"]}
+
+GRAMMAR. Each chip names one garment in this order: fabric, color, fit or silhouette, condition. Five to ten words.
+"oversized charcoal boiled-wool coat with frayed cuffs" / "high-waisted rust waxed-linen trousers, knees worn pale" / "mirror-polished oxblood leather riding boots" / "hammered brass belt cinched over it"
+- Fabric is a material a hand could feel: waxed linen, boiled wool, raw silk, oiled leather, brushed cotton, hammered brass. Never a brand, a designer, a franchise, or an invented material.
+- Fit is a silhouette: oversized, tailored, flowing, cropped, high-waisted, 7/8 length.
+- Condition is visible wear: pristine, sun-faded, patched at the elbows, salt-stained hem.
+- An accessory is worn on the body: a belt cinched, a chain looped, a satchel slung.
+
+RULES
+- The eight chips in a category are eight different garments the same person could choose between. They differ in silhouette or material, never only in wording.
+- Every chip fits this theme and no other. Nothing that could dress any theme.
+- Lowercase, no period at the end, nothing negated, no em dash. No body, face, hair, or age; those belong to the character block.

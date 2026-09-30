@@ -119,11 +119,11 @@ app.post("/api/chips", asyncRoute(async (req, res) => {
     system = prompt("chips_overlay");
     user = `Theme: "${ctx}"`;
   } else if (mode === "costume") {
-    system = prompt("chips_generic");
-    user = `Costume theme:"${ctx}"\nReturn:{"top":["..."],"bottoms":["..."],"shoes":["..."],"accessories":["..."]}`;
+    system = prompt("chips_costume");
+    user = `Costume theme: "${ctx}"`;
   } else if (mode === "character") {
-    system = prompt("chips_generic");
-    user = `Character:"${ctx}"\nReturn:{"species":["..."],"body":["..."],"age":["..."],"archetype":["..."],"skin":["..."],"eyes":["..."],"hair":["..."],"expression":["..."],"world":["..."]}`;
+    system = prompt("chips_character");
+    user = `Character: "${ctx}"`;
   } else {
     throw new Error("chips are not available for mode: " + mode);
   }
